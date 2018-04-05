@@ -7,4 +7,18 @@ setup(name='clustervariants',
       author_email='erikfas@kth.se',
       license='MIT',
       packages=['clustervariants'],
+      scripts=[
+          'bin/create_distance_matrix',
+           'bin/cluster_heatmap',
+           'bin/cluster_tsne'
+      ],
+      install_requires=[
+          'pandas',
+          'vcf',
+          'numpy',
+          'matplotlib',
+          'sklearn',
+          'seaborn',
+          'scipy'
+      ],
       zip_safe=False)
