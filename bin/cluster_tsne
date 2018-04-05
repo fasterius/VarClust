@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-
-# Import modules
 import argparse
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
-import clustervariants as cv 
+import clustervariants.preprocess_distance_matrix as preproc
+import clustervariants.cluster_tsne as cluster
 
 # Argument parser -------------------------------------------------------------
 
@@ -86,13 +83,13 @@ args = parser.parse_args()
 dist = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
-dist = cv.remove_na(dist, threshold=args.remove_na_threshold)
+dist = preproc.remove_na(dist, threshold=args.remove_na_threshold)
 
 # Add metadata (if appliable)
 if args.metadata_file is not None:
-    dist = cv.add_metadata(dist,
-                           args.metadata_file,
-                           args.metadata_id)
+    dist = preproc.add_metadata(dist,
+                                args.metadata_file,
+                                args.metadata_id)
 
 # Subset groups (if applicable)
 if args.subset is not None:
@@ -106,34 +103,31 @@ if args.subset is not None:
         sub_sets = ','.join(sub_sets)
 
         # Subset groups
-        dist = cv.filter_metadata(dist,
-                                  filter_col=sub_col,
-                                  filter_values=sub_sets)
+        dist = preproc.filter_metadata(dist,
+                                       filter_col=sub_col,
+                                       filter_values=sub_sets)
 
 # BC dataset: remove low quality samples (if applicable)
 if 'low_quality' in args.filter:
-    dist = cv.filter_metadata(dist,
-                              filter_col='sample_quality',
-                              filter_values='ok')
+    dist = preproc.filter_metadata(dist,
+                                   filter_col='sample_quality',
+                                   filter_values='ok')
 
 # BC dataset: remove bulk samples (if applicable)
 if 'bulk' in args.filter:
-    dist = cv.filter_metadata(dist,
-                              filter_col='sample_type',
-                              keep_values='single_cell')
-# Add groups to index for clustering (if applicable)
-#  groups = ','.join([args.colour_col, args.shape_col])
-#  dist, k = cv.set_index(dist, groups)
+    dist = preproc.filter_metadata(dist,
+                                   filter_col='sample_type',
+                                   keep_values='single_cell')
 
 # Perform tSNE
-tsne = cv.cluster_tsne(dist=dist,
-                       learning_rate=args.learning_rate,
-                       perplexity=args.perplexity)
+tsne = cluster.cluster_tsne(dist=dist,
+                            learning_rate=args.learning_rate,
+                            perplexity=args.perplexity)
 
 # Plot tSNE
-plot = cv.plot_tsne(tsne=tsne,
-                    dist=dist,
-                    output=args.output,
-                    alpha=args.alpha,
-                    colour_cols=args.colour_col,
-                    shape_cols=args.shape_col)
+plot = cluster.plot_tsne(tsne=tsne,
+                         dist=dist,
+                         output=args.output,
+                         alpha=args.alpha,
+                         colour_cols=args.colour_col,
+                         shape_cols=args.shape_col)

@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from preprocess_distance_matrix import remove_metadata
+from clustervariants.preprocess_distance_matrix import remove_metadata
 from sklearn.manifold import TSNE
 
 

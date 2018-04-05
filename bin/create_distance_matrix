@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-
-# Load modules
-import clustervariants as cv
 import argparse
-#  from distance_matrix import calculate_distance_matrix
+import clustervariants.read_profiles as readp
+import clustervariants.distance_matrix as dist
 
 # Argument parser -------------------------------------------------------------
 
@@ -42,22 +40,29 @@ parser.add_argument('-S', '--subset_values',
                     metavar='',
                     help='list of value(s) to subset variants on')
 parser.add_argument('-n', '--do-not-normalise',
-                    action='store_true',
+                    action='store_false',
                     dest='normalise',
                     help='do not normalise final distance matrix')
 args = parser.parse_args()
 
 # Analysis --------------------------------------------------------------------
 
+# Check for subsets
+if args.subset_cols is not None:
+    subset_cols = args.subset_cols.split(',')
+    subset_values = args.subset_values.split(',')
+else:
+    subset_cols = None
+    subset_values = None
+
 # Read profiles
-profiles = cv.read_profile_dir(args.input_dir,
-                               args.subset_cols.split(','),
-                               args.subset_values.split(','))
+profiles = readp.read_profile_dir(args.input_dir,
+                                  subset_cols,
+                                  subset_values)
 
 # Calculate distances
-dist = cv.calculate_distance_matrix(profiles=profiles,
-                                    metric=args.metric,
-                                    merge=args.merge)
+distances = dist.calculate_distance_matrix(profiles,
+                                           normalise=args.normalise)
 
-# Save distances
-dist.to_csv(args.output, sep='\t')
+# Save distances to file
+distances.to_csv(args.output, sep='\t')
