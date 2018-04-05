@@ -15,7 +15,7 @@ setup(name='clustervariants',
       ],
       install_requires=[
           'pandas',
-          'vcf',
+          'pyvcf',
           'numpy',
           'matplotlib',
           'sklearn',
