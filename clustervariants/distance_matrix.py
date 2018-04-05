@@ -38,7 +38,7 @@ def calculate_distance_matrix(profiles,
     distances = np.zeros([len(samples), len(samples)])
 
     # Calculate total number of comparisons and initialise counter
-    nn_tot = int(len(samples) * (len(samples) - 1) / 2) + len(samples)
+    nn_tot = int(len(samples) * (len(samples) - 1) / 2)
     nn = 1
 
     # Calculate distances for each pairwise comparison
