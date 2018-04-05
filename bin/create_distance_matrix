@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 # Load modules
-import read_profiles
+import clustervariants as cv
 import argparse
-from distance_matrix import calculate_distance_matrix
+#  from distance_matrix import calculate_distance_matrix
 
 # Argument parser -------------------------------------------------------------
 
@@ -50,14 +50,14 @@ args = parser.parse_args()
 # Analysis --------------------------------------------------------------------
 
 # Read profiles
-profiles = read_profiles.read_profile_dir(args.input_dir,
-                                          args.subset_cols.split(','),
-                                          args.subset_values.split(','))
+profiles = cv.read_profile_dir(args.input_dir,
+                               args.subset_cols.split(','),
+                               args.subset_values.split(','))
 
 # Calculate distances
-dist = calculate_distance_matrix(profiles=profiles,
-                                 metric=args.metric,
-                                 merge=args.merge)
+dist = cv.calculate_distance_matrix(profiles=profiles,
+                                    metric=args.metric,
+                                    merge=args.merge)
 
 # Save distances
 dist.to_csv(args.output, sep='\t')

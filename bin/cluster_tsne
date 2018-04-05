@@ -5,7 +5,7 @@ import argparse
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
-import cluster_profiles
+import clustervariants as cv 
 
 # Argument parser -------------------------------------------------------------
 
@@ -86,13 +86,13 @@ args = parser.parse_args()
 dist = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
-dist = cluster_profiles.remove_na(dist, threshold=args.remove_na_threshold)
+dist = cv.remove_na(dist, threshold=args.remove_na_threshold)
 
 # Add metadata (if appliable)
 if args.metadata_file is not None:
-    dist = cluster_profiles.add_metadata(dist,
-                                         args.metadata_file,
-                                         args.metadata_id)
+    dist = cv.add_metadata(dist,
+                           args.metadata_file,
+                           args.metadata_id)
 
 # Subset groups (if applicable)
 if args.subset is not None:
@@ -106,34 +106,34 @@ if args.subset is not None:
         sub_sets = ','.join(sub_sets)
 
         # Subset groups
-        dist = cluster_profiles.filter_metadata(dist,
-                                                filter_col=sub_col,
-                                                filter_values=sub_sets)
+        dist = cv.filter_metadata(dist,
+                                  filter_col=sub_col,
+                                  filter_values=sub_sets)
 
 # BC dataset: remove low quality samples (if applicable)
 if 'low_quality' in args.filter:
-    dist = cluster_profiles.filter_metadata(dist,
-                                            filter_col='sample_quality',
-                                            filter_values='ok')
+    dist = cv.filter_metadata(dist,
+                              filter_col='sample_quality',
+                              filter_values='ok')
 
 # BC dataset: remove bulk samples (if applicable)
 if 'bulk' in args.filter:
-    dist = cluster_profiles.filter_metadata(dist,
-                                            filter_col='sample_type',
-                                            keep_values='single_cell')
+    dist = cv.filter_metadata(dist,
+                              filter_col='sample_type',
+                              keep_values='single_cell')
 # Add groups to index for clustering (if applicable)
 #  groups = ','.join([args.colour_col, args.shape_col])
-#  dist, k = cluster_profiles.set_index(dist, groups)
+#  dist, k = cv.set_index(dist, groups)
 
 # Perform tSNE
-tsne = cluster_profiles.cluster_tsne(dist=dist,
-                                     learning_rate=args.learning_rate,
-                                     perplexity=args.perplexity)
+tsne = cv.cluster_tsne(dist=dist,
+                       learning_rate=args.learning_rate,
+                       perplexity=args.perplexity)
 
 # Plot tSNE
-plot = cluster_profiles.plot_tsne(tsne=tsne,
-                                  dist=dist,
-                                  output=args.output,
-                                  alpha=args.alpha,
-                                  colour_cols=args.colour_col,
-                                  shape_cols=args.shape_col)
+plot = cv.plot_tsne(tsne=tsne,
+                    dist=dist,
+                    output=args.output,
+                    alpha=args.alpha,
+                    colour_cols=args.colour_col,
+                    shape_cols=args.shape_col)

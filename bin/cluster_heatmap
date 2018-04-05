@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-
-# Import modules
 import argparse
 import pandas as pd
-import cluster_profiles
+import clustervariants.preprocess_distance_matrix as preproc
+import clustervariants.cluster_heatmap as heatmap
 
 # Argument parser -------------------------------------------------------------
 
@@ -104,13 +103,13 @@ args = parser.parse_args()
 dist = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
-dist = cluster_profiles.remove_na(dist, threshold=args.remove_na_threshold)
+dist = preproc.remove_na(dist, threshold=args.remove_na_threshold)
 
 # Add metadata (if appliable)
 if args.metadata_file is not None:
-    dist = cluster_profiles.add_metadata(dist,
-                                         args.metadata_file,
-                                         args.metadata_id)
+    dist = preproc.add_metadata(dist,
+                                args.metadata_file,
+                                args.metadata_id)
 
 # Subset groups (if applicable)
 if args.subset is not None:
@@ -124,33 +123,33 @@ if args.subset is not None:
         sub_sets = ','.join(sub_sets)
 
         # Subset groups
-        dist = cluster_profiles.filter_metadata(dist,
-                                                filter_col=sub_col,
-                                                filter_values=sub_sets)
+        dist = preproc.filter_metadata(dist,
+                                       filter_col=sub_col,
+                                       filter_values=sub_sets)
 
 # BC dataset: remove low quality samples (if applicable)
 if 'low_quality' in args.filter:
-    dist = cluster_profiles.filter_metadata(dist,
-                                            filter_col='sample_quality',
-                                            filter_values='ok')
+    dist = preproc.filter_metadata(dist,
+                                   filter_col='sample_quality',
+                                   filter_values='ok')
 
 # BC dataset: remove bulk samples (if applicable)
 if 'bulk' in args.filter:
-    dist = cluster_profiles.filter_metadata(dist,
-                                            filter_col='sample_type',
-                                            keep_values='single_cell')
+    dist = preproc.filter_metadata(dist,
+                                   filter_col='sample_type',
+                                   keep_values='single_cell')
 
 # Add groups to index for clustering (if applicable)
-dist, k = cluster_profiles.set_index(dist, args.group_cols)
+dist, k = preproc.set_index(dist, args.group_cols)
 
 # Perform hierarchical clustering and plot
-cluster_profiles.cluster_hierarchical(dist,
-                                      args.output,
-                                      args.linkage_method,
-                                      print_statistics=args.hide_stats,
-                                      plot_dendrogram=args.plot_dendro,
-                                      truncate_mode=args.truncate,
-                                      fig_size=args.fig_size,
-                                      p=args.truncate_p,
-                                      k=k,
-                                      ct=args.colour_threshold)
+heatmap.cluster_hierarchical(dist,
+                             args.output,
+                             args.linkage_method,
+                             print_statistics=args.hide_stats,
+                             plot_dendrogram=args.plot_dendro,
+                             truncate_mode=args.truncate,
+                             fig_size=args.fig_size,
+                             p=args.truncate_p,
+                             k=k,
+                             ct=args.colour_threshold)
