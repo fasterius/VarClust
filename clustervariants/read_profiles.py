@@ -1,28 +1,25 @@
-#!/usr/bin/env python3
-
-# Import modules
 import os
 import pandas as pd
 
 
-def vectorise(data):
+def vectorise(row_data):
     "Converts genotypes into 10-element vectors"
 
-    # Define 10-element genotype vector
-    geno = ['AA', 'AC', 'AG', 'AT', 'CC', 'CG', 'CT', 'GG', 'GT', 'TT']
+    #  # Define 10-element genotype vector
+    #  geno = ['AA', 'AC', 'AG', 'AT', 'CC', 'CG', 'CT', 'GG', 'GT', 'TT']
 
     # Sort the genotype column
-    sorted_genotype = ''.join(sorted(data['genotype']))
-    data['genotype'] = sorted_genotype
+    sorted_genotype = ''.join(sorted(row_data['genotype']))
+    row_data['genotype'] = sorted_genotype
 
-    # Find index of (sorted) genotypes
-    index = 10 - geno.index(sorted_genotype)
+    #  # Find index of (sorted) genotypes
+    #  index = 10 - geno.index(sorted_genotype)
+#
+    #  # Add 1 to relevant column
+    #  row_data[-index] = 1
 
-    # Add 1 to relevant column
-    data[-index] = 1
-
-    # Return data with sorted genotype and vectorised genotype columns
-    return data
+    # Return row_data with sorted genotype and vectorised genotype columns
+    return row_data
 
 
 def read_profile(file,
@@ -51,23 +48,24 @@ def read_profile(file,
     # Merge alleles into genotypes
     data['genotype'] = data['A1'] + data['A2']
 
-    # Define 10-element genotype vector and add to dataframe
-    geno = ['AA', 'AC', 'AG', 'AT', 'CC', 'CG', 'CT', 'GG', 'GT', 'TT']
-    data = data.reindex(columns=list(data) + geno, fill_value=0)
+    #  # Define 10-element genotype vector and add to dataframe
+    #  geno = ['AA', 'AC', 'AG', 'AT', 'CC', 'CG', 'CT', 'GG', 'GT', 'TT']
+    #  data = data.reindex(columns=list(data) + geno, fill_value=0)
 
     # Vectorise genotypes
     data = data.apply(vectorise, axis=1)
 
     # Keep relevant columns
-    data = data[['chr', 'pos', 'genotype'] + geno]
+    #  data = data[['chr', 'pos', 'genotype'] + geno]
+    data = data[['chr', 'pos', 'genotype']]
 
     # Return final dataframe
     return data
 
 
-def read_profile_dir(in_dir,
-                     subset_col=None,
-                     subset_values=None):
+def read_profiles_in_dir(in_dir,
+                         subset_col=None,
+                         subset_values=None):
     "Reads all SNV profiles in a given directory"
 
     # List all profile files

@@ -1,19 +1,19 @@
-#!/usr/bin/env python3
-
-# Import modules
 import os
 import vcf
 
 
-def create_profile(input, sample, output, filter_depth=10):
+def create_profile(input_file,
+                   input_sample,
+                   output_file,
+                   filter_depth=10):
     "Create SNV profiles from VCF files."
 
-    # Remove output file if already existing
-    if os.path.isfile(output):
-        os.remove(output)
+    # Remove output_file file if already existing
+    if os.path.isfile(output_file):
+        os.remove(output_file)
 
-    # Open output file for appending
-    output_file = open(output, 'a')
+    # Open output_file file for appending
+    output_file_file = open(output_file, 'a')
 
     # Header row
     header = \
@@ -26,10 +26,10 @@ def create_profile(input, sample, output, filter_depth=10):
         'A2\n'
 
     # Write header to file
-    output_file.write(header)
+    output_file_file.write(header)
 
-    # Open input VCF file
-    vcf_reader = vcf.Reader(filename=input)
+    # Open input_file VCF file
+    vcf_reader = vcf.Reader(filename=input_file)
 
     # Read each record in the VCF file
     for record in vcf_reader:
@@ -46,9 +46,9 @@ def create_profile(input, sample, output, filter_depth=10):
 
         # Collect genotype info (skip record if any is missing)
         try:
-            gt = record.genotype(str(sample))['GT']
-            ad = record.genotype(str(sample))['AD']
-            dp = record.genotype(str(sample))['DP']
+            gt = record.genotype(str(input_sample))['GT']
+            ad = record.genotype(str(input_sample))['AD']
+            dp = record.genotype(str(input_sample))['DP']
         except AttributeError:
             continue
 
@@ -109,13 +109,15 @@ def create_profile(input, sample, output, filter_depth=10):
             str(A2GT) + '\n'
 
         # Write to file
-        output_file.write(variant)
+        output_file_file.write(variant)
 
-    # Close output file
-    output_file.close()
+    # Close output_file file
+    output_file_file.close()
 
 
-def create_profiles_dir(input_dir, output_dir, filter_depth=10):
+def create_profiles_in_dir(input_dir,
+                           output_dir,
+                           filter_depth=10):
     "Creates profiles for each VCF in a directory."
 
     # Get all files in directory
@@ -131,18 +133,18 @@ def create_profiles_dir(input_dir, output_dir, filter_depth=10):
     # Loop through each VCF
     for file in files:
 
-        # Get current sample name
-        sample = file.replace('.vcf.gz', '')
+        # Get current input_sample name
+        input_sample = file.replace('.vcf.gz', '')
 
         # Fix variables and filenames
         profile = file.replace('.vcf.gz', '.profile.txt')
-        output = output_dir + '/' + profile
+        output_file = output_dir + '/' + profile
         file = input_dir + '/' + file
 
         # Create SNV profile from VCF
-        print('Creating profile for ' + sample + ' [' + str(nn) + ' / ' +
+        print('Creating profile for ' + input_sample + ' [' + str(nn) + ' / ' +
               str(nn_tot) + ']')
-        create_profile(file, sample, output, filter_depth)
+        create_profile(file, input_sample, output_file, filter_depth)
 
         # Increment counter
         nn += 1
