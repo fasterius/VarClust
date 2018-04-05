@@ -27,7 +27,7 @@ def calculate_distance(data_1,
 
 
 def calculate_distance_matrix(profiles,
-                              normalise=True):
+                              normalise=False):
     "Calculate distances for all combinations of provided samples"
 
     # Get all samples

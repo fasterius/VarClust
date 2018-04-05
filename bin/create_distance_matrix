@@ -6,27 +6,14 @@ import clustervariants.distance_matrix as dist
 # Argument parser -------------------------------------------------------------
 
 parser = argparse.ArgumentParser(epilog='Calculates a distance matrix for the '
-                                        'chosen metric of all SNV profiles in '
-                                        'the input directory.')
+                                        'similarity score of all SNV profiles '
+                                        'in the input directory.')
 parser.add_argument('input_dir',
                     type=str,
                     help='input directory path containing the SNV profiles')
 parser.add_argument('output',
                     type=str,
                     help='output distance matrix file path')
-parser.add_argument('-m', '--metric',
-                    type=str,
-                    dest='metric',
-                    default='cosine',
-                    metavar='',
-                    help='[cosine, euclidean, similarity_score, '
-                          'distance_aware, correlation (default)]')
-parser.add_argument('-M', '--merge',
-                    type=str,
-                    dest='merge',
-                    default='inner',
-                    metavar='',
-                    help='merge method [inner or outer (default)]')
 parser.add_argument('-s', '--subset_cols',
                     type=str,
                     dest='subset_cols',
@@ -39,10 +26,10 @@ parser.add_argument('-S', '--subset_values',
                     default=None,
                     metavar='',
                     help='list of value(s) to subset variants on')
-parser.add_argument('-n', '--do-not-normalise',
-                    action='store_false',
+parser.add_argument('-n', '--normalise',
+                    action='store_true',
                     dest='normalise',
-                    help='do not normalise final distance matrix')
+                    help='normalise final distance matrix')
 args = parser.parse_args()
 
 # Analysis --------------------------------------------------------------------
