@@ -135,27 +135,20 @@ def plot_tsne(tsne,
         # Get colour column
         if colour_col.lower() != "none":
             colours = dist[colour_col]
-            colour_out = "." + colour_col
         else:
             dist['colour_temp'] = 1
             colours = dist['colour_temp']
-            colour_out = ""
 
         # Get shape column
         if (shape_col.lower() != "none") and (shape_col != colour_col):
             shapes = dist[shape_col]
-            shape_out = "." + shape_col
         else:
             dist['shape_temp'] = 1
             shapes = dist['shape_temp']
-            shape_out = ""
 
         # Add colour and shape columns
         tsne['colour'] = colours.values
         tsne['shape'] = shapes.values
 
-        # Add colour/shape names to output
-        final_output = output.replace(".png", colour_out + shape_out + ".png")
-
         # Plot tSNE
-        create_tsne_plot(tsne, final_output)
+        create_tsne_plot(tsne, output)
