@@ -14,6 +14,7 @@ setup(name='clustervariants',
            'bin/cluster_tsne'
       ],
       install_requires=[
+          'argparse',
           'pandas',
           'pyvcf',
           'numpy',
