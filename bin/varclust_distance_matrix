@@ -26,6 +26,12 @@ parser.add_argument('-S', '--subset_values',
                     default=None,
                     metavar='',
                     help='list of value(s) to subset variants on')
+parser.add_argument('-l', '--unique-level',
+                    type=str,
+                    dest='unique_level',
+                    default='gene',
+                    metavar='',
+                    help='unique variant level: gene [default] or position')
 parser.add_argument('-n', '--normalise',
                     action='store_true',
                     dest='normalise',
@@ -44,6 +50,7 @@ else:
 
 # Read profiles
 profiles = readp.read_profile_dir(args.input_dir,
+                                  args.unique_level,
                                   subset_cols,
                                   subset_values)
 

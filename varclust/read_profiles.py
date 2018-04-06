@@ -14,10 +14,10 @@ def sort_genotype(row_data):
 
 
 def read_profile(file,
+                 by_unique='gene',
                  subset_cols=None,
                  subset_values=None):
-    """Reads an SNV profile created by seqCAT and converts each genotype into
-    10-element one-hot vectors."""
+    """Reads a SNV profile."""
 
     # Read file with pandas
     data = pd.read_table(file, sep='\t')
@@ -33,8 +33,15 @@ def read_profile(file,
             for col in subset_cols:
                 data = data.loc[data[col].isin(subset_values)]
 
-    # Remove duplicated rows (if present)
-    data = data.drop_duplicates(subset=['chr', 'pos'])
+    # Remove duplicated variants at specified level (if present)
+    if by_unique == 'gene':
+        unique_level = ['chr', 'pos', 'ENSGID']
+    elif by_unique == 'position':
+        unique_level = ['chr', 'pos']
+    else:
+        raise ValueError('unique variant level specification \"' + by_unique +
+                         '\" not valid; use \"gene\" or \"position\".')
+    data = data.drop_duplicates(subset=unique_level)
 
     # Merge alleles into genotypes
     data['genotype'] = data['A1'] + data['A2']
@@ -42,14 +49,15 @@ def read_profile(file,
     # Sort genotypes
     data = data.apply(sort_genotype, axis=1)
 
-    # Keep relevant columns
-    data = data[['chr', 'pos', 'genotype']]
+    # Drop allele columns
+    data = data.drop(columns=['A1', 'A2'])
 
     # Return final dataframe
     return data
 
 
 def read_profile_dir(in_dir,
+                     by_unique='gene',
                      subset_cols=None,
                      subset_values=None):
     "Reads all SNV profiles in a given directory"
@@ -72,7 +80,8 @@ def read_profile_dir(in_dir,
         # Read profile and add to dictionary
         print('Reading profile for ' + sample + ' [' + str(nn) + ' / ' +
               str(nn_tot) + ']')
-        profiles[sample] = read_profile(file, subset_cols, subset_values)
+        profiles[sample] = read_profile(file, by_unique, subset_cols,
+                                        subset_values)
 
         # Increment counter
         nn += 1
