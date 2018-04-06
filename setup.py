@@ -9,6 +9,7 @@ setup(name='varclust',
       license='MIT',
       packages=['varclust'],
       scripts=[
+          'bin/varclust_create_profiles',
           'bin/varclust_distance_matrix',
           'bin/varclust_heatmap',
           'bin/varclust_tsne'
