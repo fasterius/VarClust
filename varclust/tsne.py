@@ -1,13 +1,13 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from clustervariants.preprocess_distance_matrix import remove_metadata
 from sklearn.manifold import TSNE
+from varclust.metadata import remove_metadata
 
 
-def cluster_tsne(dist,
-                 perplexity=30,
-                 learning_rate=200):
+def tSNE(dist,
+         perplexity=30,
+         learning_rate=200):
     "Cluster a distance matrix using tSNE."
 
     # Remove metadata
@@ -28,7 +28,7 @@ def cluster_tsne(dist,
     return tsne
 
 
-def create_tsne_plot(tsne,
+def create_tSNE_plot(tsne,
                      output,
                      alpha=0.75):
     "Plot results from tSNE clustering."
@@ -120,7 +120,7 @@ def create_tsne_plot(tsne,
     plt.savefig(output, dpi=300)
 
 
-def plot_tsne(tsne,
+def plot_tSNE(tsne,
               dist,
               output,
               alpha=0.75,
@@ -151,4 +151,4 @@ def plot_tsne(tsne,
         tsne['shape'] = shapes.values
 
         # Plot tSNE
-        create_tsne_plot(tsne, output)
+        create_tSNE_plot(tsne, output)

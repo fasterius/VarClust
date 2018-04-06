@@ -1,17 +1,17 @@
 from setuptools import setup
 
-setup(name='clustervariants',
+setup(name='varclust',
       version='0.1.0',
-      description='Cluster single nucleotide variants from HTS data',
+      description='Variant clustering of high throughput sequencing data',
       author='Erik Fasterius',
       author_email='erikfas@kth.se',
-      url='http://github.com/fasterius/variantclustering',
+      url='http://github.com/fasterius/varclust',
       license='MIT',
-      packages=['clustervariants'],
+      packages=['varclust'],
       scripts=[
-          'bin/create_distance_matrix',
-           'bin/cluster_heatmap',
-           'bin/cluster_tsne'
+          'bin/varclust_distance_matrix',
+          'bin/varclust_heatmap',
+          'bin/varclust_tsne'
       ],
       install_requires=[
           'argparse',

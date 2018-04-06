@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import scipy.spatial.distance as dist
 from sklearn.cluster import KMeans
 from scipy.cluster.hierarchy import linkage, fcluster
-from clustervariants.preprocess_distance_matrix import remove_metadata
+from varclust.metadata import remove_metadata
 
 
 def find_best_k(distances,
