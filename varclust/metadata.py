@@ -1,17 +1,6 @@
 import pandas as pd
 
 
-def remove_metadata(distance):
-    "Removes metadata columns from a distance matrix."
-
-    # Check if distance matrix contains metadata and remove if applicable
-    if distance.shape[0] != distance.shape[1]:
-        distance = distance.iloc[:, 0:distance.shape[0]]
-
-    # Return pure distance matrix
-    return distance
-
-
 def remove_na(distance, threshold=5):
     "Removes combinations containing NA values from a distance matrix."
 
@@ -55,7 +44,8 @@ def add_metadata(distances,
 
 def filter_metadata(dist,
                     filter_col,
-                    filter_values):
+                    filter_values,
+                    expression=False):
     "Filter a distance matrix on its metadata columns."
 
     # Check if column exists in data
@@ -63,8 +53,12 @@ def filter_metadata(dist,
         raise RuntimeError(filter_col + " column not in data")
 
     # Get indexes to drop
-    filter_values = filter_values.split(',')
-    remove_index = dist[~dist[filter_col].isin(filter_values)].index
+    if expression:
+        eval_string = 'dist[filter_col]' + filter_values
+        remove_index = dist.loc[~eval(eval_string)].index
+    else:
+        filter_values = filter_values.split(',')
+        remove_index = dist[~dist[filter_col].isin(filter_values)].index
 
     # Drop the appropriate indexes from rows and columns
     for ax in [0, 1]:
@@ -109,3 +103,14 @@ def set_index(dist,
 
     # Return distance matrix with new index and k
     return dist, k
+
+
+def remove_metadata(distance):
+    "Removes metadata columns from a distance matrix."
+
+    # Check if distance matrix contains metadata and remove if applicable
+    if distance.shape[0] != distance.shape[1]:
+        distance = distance.iloc[:, 0:distance.shape[0]]
+
+    # Return pure distance matrix
+    return distance

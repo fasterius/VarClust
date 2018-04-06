@@ -102,10 +102,18 @@ if args.subset is not None:
         sub_sets = sub_group.split(',')[1:]
         sub_sets = ','.join(sub_sets)
 
+        # Check for numerical subset
+        expr_list = ['<', '>', '=']
+        if any(substring in sub_sets for substring in expr_list):
+            expression = True
+        else:
+            expression = False
+
         # Subset groups
         dist = meta.filter_metadata(dist,
                                     filter_col=sub_col,
-                                    filter_values=sub_sets)
+                                    filter_values=sub_sets,
+                                    expression=expression)
 
 # BC dataset: remove low quality samples (if applicable)
 if 'low_quality' in args.filter:
