@@ -2,43 +2,137 @@ import os
 import vcf
 
 
+def col_sort(string):
+    "Sort order specification."
+
+    s = string.split('\t')
+    return [s[0].upper().replace('_', ' '),
+            int(s[1]),
+            s[3].upper(),
+            s[4].upper(),
+            s[5].upper().replace('.', ':'),
+            s[8].upper(),
+            s[9].upper(),
+            s[10].upper()]
+
+
+def full_profile(chrom, pos, rsid, ref, alt, dp, ad, A1GT, A2GT, ann):
+
+    # Collate record info to a set
+    result = ['%s %s %s %s %s %s %s %s %s %s' %
+              (line.split('|')[3], line.split('|')[4], line.split('|')[2],
+               line.split('|')[1], line.split('|')[5], line.split('|')[6],
+               line.split('|')[7], line.split('|')[9], line.split('|')[10],
+               line.split('|')[15]) for line in ann]
+    result = set(result)
+
+    # Priority list for impacts
+    priority_list = ['MODIFIER', 'LOW', 'MODERATE', 'HIGH']
+
+    # Find the highest impact for the current record
+    max_index = -1
+    for line in result:
+        [gene, ensgid, impact, effect, feature, enst, biotype, nucl, aacid,
+            warnings] = line.split(' ')
+        max_index = max(max_index, priority_list.index(impact))
+    max_impact = priority_list[max_index]
+
+    # Add all unique highest impact lines to final set
+    unique_lines = set()
+    for line in result:
+        [gene, ensgid, impact, effect, feature, enst, biotype, nucl, aacid,
+            warnings] = line.split(' ')
+        if impact == max_impact:
+            current = str(chrom) + "\t" + \
+                      str(pos) + "\t" + \
+                      str(rsid) + "\t" +  \
+                      str(gene) + "\t" + \
+                      str(ensgid) + "\t" + \
+                      str(enst) + "\t" + \
+                      str(ref) + "\t" + \
+                      str(alt[0]) + "\t" + \
+                      str(impact) + "\t" + \
+                      str(effect) + "\t" + \
+                      str(feature) + "\t" + \
+                      str(biotype) + "\t" + \
+                      str(dp) + "\t" + \
+                      str(ad[0]) + "\t" + \
+                      str(ad[1]) + "\t" + \
+                      str(A1GT) + "\t" + \
+                      str(A2GT) + "\t" + \
+                      str(warnings) + "\n"
+
+            # Add to final set (if unique)
+            if current not in unique_lines:
+                unique_lines.add(current)
+
+    return unique_lines
+
+
 def create_profile(input_file,
                    input_sample,
                    output_file,
-                   filter_depth=10):
+                   filter_depth=10,
+                   method="full"):
     "Create SNV profiles from VCF files."
 
-    # Remove output_file file if already existing
+    # Remove output file if already existing
     if os.path.isfile(output_file):
         os.remove(output_file)
 
-    # Open output_file file for appending
-    output_file_file = open(output_file, 'a')
+    # Open output file for appending
+    output_file = open(output_file, 'a')
 
     # Header row
-    header = \
-        'chr\t' + \
-        'pos\t' + \
-        'DP\t' + \
-        'AD1\t' + \
-        'AD2\t' + \
-        'A1\t' + \
-        'A2\n'
+    if method == "position_only":
+        header = \
+            'chr\t' + \
+            'pos\t' + \
+            'DP\t' + \
+            'AD1\t' + \
+            'AD2\t' + \
+            'A1\t' + \
+            'A2\n'
+    elif method == "full":
+        header = \
+            'chr\t' + \
+            'pos\t' + \
+            'rsID\t' + \
+            'gene\t' + \
+            'ENSGID\t' + \
+            'ENSTID\t' + \
+            'REF\t' + \
+            'ALT\t' + \
+            'impact\t' + \
+            'effect\t' + \
+            'feature\t' + \
+            'biotype\t' + \
+            'DP\t' + \
+            'AD1\t' + \
+            'AD2\t' + \
+            'A1\t' + \
+            'A2\t' + \
+            'warnings\n'
+    else:
+        raise ValueError('wrong method specification \"' + method + '\"; ' +
+                         'please use <full> or <position_only>')
 
     # Write header to file
-    output_file_file.write(header)
+    output_file.write(header)
 
-    # Open input_file VCF file
+    # Open input VCF file
     vcf_reader = vcf.Reader(filename=input_file)
 
     # Read each record in the VCF file
     for record in vcf_reader:
 
         # Get record info
-        chrom = record.CHROM
-        pos = record.POS
         ref = record.REF
         alt = str(record.ALT).strip('[]')
+        chrom = record.CHROM
+        pos = record.POS
+        if method == 'full':
+            rsid = record.ID
 
         # Skip non-SNVs
         if len(ref) > 1 or len(alt) > 1:
@@ -56,9 +150,11 @@ def create_profile(input_file,
         if gt is None:
             continue
 
-        # Collect annotation infor (skip record if missing)
+        # Collect annotation information (skip record if missing)
         try:
             filt = record.FILTER
+            if method == 'full':
+                ann = record.INFO['ANN']
         except KeyError:
             continue
 
@@ -99,25 +195,31 @@ def create_profile(input_file,
         else:
             A2GT = alt
 
-        # String for current variant
-        variant = str(chrom) + '\t' + \
-            str(pos) + '\t' + \
-            str(dp) + '\t' + \
-            str(ad[0]) + '\t' + \
-            str(ad[1]) + '\t' + \
-            str(A1GT) + '\t' + \
-            str(A2GT) + '\n'
+        # Finalise current variant output
+        if method == "full":
+            output = full_profile(chrom, pos, rsid, ref, alt, dp, ad, A1GT,
+                                  A2GT, ann)
+            output_file.writelines(sorted(output, key=col_sort))
 
-        # Write to file
-        output_file_file.write(variant)
+        elif method == "position_only":
+            output = \
+                str(chrom) + '\t' + \
+                str(pos) + '\t' + \
+                str(dp) + '\t' + \
+                str(ad[0]) + '\t' + \
+                str(ad[1]) + '\t' + \
+                str(A1GT) + '\t' + \
+                str(A2GT) + '\n'
+            output_file.write(output)
 
-    # Close output_file file
-    output_file_file.close()
+    # Close output file
+    output_file.close()
 
 
 def create_profiles_in_dir(input_dir,
                            output_dir,
-                           filter_depth=10):
+                           filter_depth=10,
+                           method='full'):
     "Creates profiles for each VCF in a directory."
 
     # Get all files in directory
@@ -144,7 +246,7 @@ def create_profiles_in_dir(input_dir,
         # Create SNV profile from VCF
         print('Creating profile for ' + input_sample + ' [' + str(nn) + ' / ' +
               str(nn_tot) + ']')
-        create_profile(file, input_sample, output_file, filter_depth)
+        create_profile(file, input_sample, output_file, filter_depth, method)
 
         # Increment counter
         nn += 1
