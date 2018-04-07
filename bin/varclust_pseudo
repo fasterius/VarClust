@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+import argparse
+import varclust.pseudo_profiles as pseudo
+
+# Argument parser -------------------------------------------------------------
+
+parser = argparse.ArgumentParser(epilog='Create pseudo-profile(s).')
+parser.add_argument('input_dir',
+                    type=str,
+                    help='input directory path containing the VCF files')
+parser.add_argument('output_file',
+                    type=str,
+                    help='pseudo-profile output file path')
+parser.add_argument('-m', '--metadata',
+                    type=str,
+                    dest='metadata',
+                    default=None,
+                    metavar='',
+                    help='metadata file path')
+parser.add_argument('-M', '--metadata-id-col',
+                    type=str,
+                    dest='metadata_id_col',
+                    default=None,
+                    metavar='',
+                    help='metadata ID column')
+parser.add_argument('-s', '--sample-subset-cols',
+                    type=str,
+                    dest='sample_subset_cols',
+                    default=None,
+                    metavar='',
+                    help='column(s) to subset samples on')
+parser.add_argument('-S', '--sample-subset-values',
+                    type=str,
+                    dest='sample_subset_values',
+                    default=None,
+                    metavar='',
+                    help='value(s) to subset samples on')
+parser.add_argument('-v', '--variant-subset-cols',
+                    type=str,
+                    dest='variant_subset_cols',
+                    default=None,
+                    metavar='',
+                    help='column(s) to subset variants on')
+parser.add_argument('-V', '--variant-subset-values',
+                    type=str,
+                    dest='variant_subset_values',
+                    default=None,
+                    metavar='',
+                    help='value(s) to subset variants on')
+parser.add_argument('-b', '--merge-by',
+                    type=str,
+                    dest='merge_by',
+                    default='gene',
+                    metavar='',
+                    help='merge by unique genes [default] or positions')
+parser.add_argument('-c', '--proportion-cutoff',
+                    type=int,
+                    dest='proportion_cutoff',
+                    default=10,
+                    metavar='',
+                    help='proportion cutoff for genes/variants [default: 10]')
+parser.add_argument('-e', '--encoding',
+                    type=str,
+                    dest='encoding',
+                    default='iso8859_16',
+                    metavar='',
+                    help='encoding for reading metadata [default: iso8859_16]')
+args = parser.parse_args()
+
+# Analysis --------------------------------------------------------------------
+
+# Get subset strings
+if args.sample_subset_cols is not None:
+    sample_subset_cols = args.sample_subset_cols.split(',')
+else:
+    sample_subset_cols = None
+if args.sample_subset_values is not None:
+    sample_subset_values = args.sample_subset_values.split(',')
+else:
+    sample_subset_values = None
+if args.variant_subset_cols is not None:
+    variant_subset_cols = args.variant_subset_cols.split(',')
+else:
+    variant_subset_cols = None
+if args.variant_subset_values is not None:
+    variant_subset_values = args.variant_subset_values.split(',')
+else:
+    variant_subset_values = None
+
+# Create pseudo-profile
+pseudo.create_pseudo_profile(args.input_dir,
+                             args.output_file,
+                             args.metadata,
+                             args.metadata_id_col,
+                             sample_subset_cols,
+                             sample_subset_values,
+                             variant_subset_cols,
+                             variant_subset_values,
+                             args.merge_by,
+                             args.proportion_cutoff,
+                             args.encoding)
