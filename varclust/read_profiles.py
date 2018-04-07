@@ -58,6 +58,7 @@ def read_profile(file,
 
 def read_profile_dir(in_dir,
                      by_unique='gene',
+                     samples=None,
                      subset_cols=None,
                      subset_values=None):
     "Reads all SNV profiles in a given directory"
@@ -67,7 +68,7 @@ def read_profile_dir(in_dir,
     files = [name for name in files if '.profile.txt' in name]
 
     # Calculate total profiles to read and initialise counter
-    nn_tot = len(files)
+    nn_tot = min(len(files), len(samples))
     nn = 1
 
     # Read each profile and save in a dictionary
@@ -76,6 +77,11 @@ def read_profile_dir(in_dir,
 
         # Get current sample name
         sample = file.split('/')[-1].split('.')[0]
+
+        # Only read provided samples (if applicable)
+        if samples is not None:
+            if sample not in samples:
+                continue
 
         # Read profile and add to dictionary
         print('Reading profile for ' + sample + ' [' + str(nn) + ' / ' +
