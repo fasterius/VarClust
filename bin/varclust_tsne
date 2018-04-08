@@ -6,45 +6,26 @@ import varclust.tsne as tsne
 
 # Argument parser -------------------------------------------------------------
 
-parser = argparse.ArgumentParser(epilog='tsnes and plots a distance matrix '
+parser = argparse.ArgumentParser(epilog='tsnes and plots a distancesance matrix '
                                         'using the tSNE tsneing method.')
 parser.add_argument('input',
                     type=str,
-                    help='input distance matrix file path')
+                    help='input distancesance matrix file path')
 parser.add_argument('output',
                     type=str,
                     help='output image file path')
-parser.add_argument('-r', '--remove-na-threshold',
-                    type=int,
-                    default=5,
-                    dest='remove_na_threshold',
-                    metavar='',
-                    help='remove rows/columns containing NAs >= threshold')
-parser.add_argument('-a', '--alpha',
-                    type=float,
-                    default=0.75,
-                    dest='alpha',
-                    metavar='',
-                    help='alpha value for points [default: 0.75]')
 parser.add_argument('-m', '--metadata-file',
                     type=str,
                     dest='metadata_file',
                     default=None,
                     metavar='',
                     help='metadata file path')
-parser.add_argument('-i', '--metadata-id',
+parser.add_argument('-M', '--metadata-id',
                     type=str,
                     dest='metadata_id',
                     default=None,
                     metavar='',
                     help='metadata id column to merge on')
-parser.add_argument('-f', '--filter',
-                    type=str,
-                    dest='filter',
-                    default='none',
-                    metavar='',
-                    help='filter cells [none (default), low_quality, '
-                         'low_quality_and_bulk]')
 parser.add_argument('-c', '--colour-col',
                     type=str,
                     dest='colour_col',
@@ -75,21 +56,33 @@ parser.add_argument('-l', '--learning-rate',
                     default=20,
                     metavar='',
                     help='learning rate [default: 200]')
+parser.add_argument('-a', '--alpha',
+                    type=float,
+                    default=0.75,
+                    dest='alpha',
+                    metavar='',
+                    help='alpha value for points [default: 0.75]')
+parser.add_argument('-r', '--remove-na-threshold',
+                    type=int,
+                    default=5,
+                    dest='remove_na_threshold',
+                    metavar='',
+                    help='remove rows/columns containing NAs >= threshold')
 args = parser.parse_args()
 
 # Analysis --------------------------------------------------------------------
 
-# Read distance matrix
-dist = pd.read_csv(args.input, sep='\t', index_col=0)
+# Read distancesance matrix
+distances = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
-dist = meta.remove_na(dist, threshold=args.remove_na_threshold)
+distances = meta.remove_na(distances, threshold=args.remove_na_threshold)
 
 # Add metadata (if appliable)
 if args.metadata_file is not None:
-    dist = meta.add_metadata(dist,
-                             args.metadata_file,
-                             args.metadata_id)
+    distances = meta.add_metadata(distances,
+                                  args.metadata_file,
+                                  args.metadata_id)
 
 # Subset groups (if applicable)
 if args.subset is not None:
@@ -110,31 +103,19 @@ if args.subset is not None:
             expression = False
 
         # Subset groups
-        dist = meta.filter_metadata(dist,
-                                    filter_col=sub_col,
-                                    filter_values=sub_sets,
-                                    expression=expression)
-
-# BC dataset: remove low quality samples (if applicable)
-if 'low_quality' in args.filter:
-    dist = meta.filter_metadata(dist,
-                                filter_col='sample_quality',
-                                filter_values='ok')
-
-# BC dataset: remove bulk samples (if applicable)
-if 'bulk' in args.filter:
-    dist = meta.filter_metadata(dist,
-                                filter_col='sample_type',
-                                keep_values='single_cell')
+        distances = meta.filter_metadata(distances,
+                                         filter_col=sub_col,
+                                         filter_values=sub_sets,
+                                         expression=expression)
 
 # Perform tSNE
-clust = tsne.tSNE(dist=dist,
+clust = tsne.tSNE(distances=distances,
                   learning_rate=args.learning_rate,
                   perplexity=args.perplexity)
 
 # Plot tSNE
 plot = tsne.plot_tSNE(tsne=clust,
-                      dist=dist,
+                      distances=distances,
                       output=args.output,
                       alpha=args.alpha,
                       colour_cols=args.colour_col,

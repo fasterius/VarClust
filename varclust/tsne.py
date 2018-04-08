@@ -5,20 +5,20 @@ from sklearn.manifold import TSNE
 from varclust.metadata import remove_metadata
 
 
-def tSNE(dist,
+def tSNE(distances,
          perplexity=30,
          learning_rate=200):
-    "Cluster a distance matrix using tSNE."
+    "Cluster a distancesance matrix using tSNE."
 
     # Remove metadata
-    dist = remove_metadata(dist)
+    distances = remove_metadata(distances)
 
     # Perform tSNE
     model = TSNE(n_components=2,
                  metric='precomputed',
                  perplexity=perplexity,
                  learning_rate=learning_rate)
-    tsne = model.fit_transform(dist)
+    tsne = model.fit_transform(distances)
 
     # Convert to dataframe
     tsne = pd.DataFrame(tsne)
@@ -121,7 +121,7 @@ def create_tSNE_plot(tsne,
 
 
 def plot_tSNE(tsne,
-              dist,
+              distances,
               output,
               alpha=0.75,
               colour_cols=None,
@@ -134,17 +134,17 @@ def plot_tSNE(tsne,
 
         # Get colour column
         if colour_col.lower() != "none":
-            colours = dist[colour_col]
+            colours = distances[colour_col]
         else:
-            dist['colour_temp'] = 1
-            colours = dist['colour_temp']
+            distances['colour_temp'] = 1
+            colours = distances['colour_temp']
 
         # Get shape column
         if (shape_col.lower() != "none") and (shape_col != colour_col):
-            shapes = dist[shape_col]
+            shapes = distances[shape_col]
         else:
-            dist['shape_temp'] = 1
-            shapes = dist['shape_temp']
+            distances['shape_temp'] = 1
+            shapes = distances['shape_temp']
 
         # Add colour and shape columns
         tsne['colour'] = colours.values

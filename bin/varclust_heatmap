@@ -7,31 +7,29 @@ import varclust.heatmap as heatmap
 # Argument parser -------------------------------------------------------------
 
 parser = argparse.ArgumentParser(epilog='Hierarchically clusters and plots a '
-                                        'distance matrix using the chosen '
-                                        'method.')
+                                        'distancesance matrix using the '
+                                        'chosen method.')
 parser.add_argument('input',
                     type=str,
-                    help='input distance matrix file path')
+                    help='input distancesance matrix file path')
 parser.add_argument('output',
                     type=str,
                     help='output image file path')
-parser.add_argument('-p', '--patients-only',
+parser.add_argument('-A', '--print-ARI',
+                    dest='print_ari',
                     action='store_true',
-                    dest='patients_only',
-                    help='only cluster on patients, regardless of cell type')
-parser.add_argument('-r', '--remove-na-threshold',
-                    type=int,
-                    default=5,
-                    dest='remove_na_threshold',
-                    metavar='',
-                    help='remove rows/columns containing NAs >= threshold')
+                    help='also print the ARI to stdout')
+parser.add_argument('-n', '--no-plot',
+                    dest='no_plot',
+                    action='store_true',
+                    help='do not plot the heatmap')
 parser.add_argument('-m', '--metadata-file',
                     type=str,
                     dest='metadata_file',
                     default=None,
                     metavar='',
                     help='metadata file path')
-parser.add_argument('-i', '--metadata-id',
+parser.add_argument('-M', '--metadata-id',
                     type=str,
                     dest='metadata_id',
                     default='SRR',
@@ -44,72 +42,39 @@ parser.add_argument('-l', '--linkage-method',
                     metavar='',
                     help='[complete (default), single, average, centroid, '
                          'median, ward, weighted]')
-parser.add_argument('-f', '--filter',
-                    type=str,
-                    dest='filter',
-                    default='none',
-                    metavar='',
-                    help='filter cells [none (default), low_quality, '
-                         'low_quality_and_bulk]')
-parser.add_argument('-c', '--colour-threshold',
-                    type=int,
-                    dest='colour_threshold',
-                    default=0,
-                    metavar='',
-                    help='threshold for branch colours [default: 0]')
 parser.add_argument('-g', '--group-cols',
                     type=str,
                     dest='group_cols',
                     default=None,
                     metavar='',
                     help='group columns [format: group1,group2,...]')
-parser.add_argument('-t', '--truncate-mode',
-                    type=str,
-                    dest='truncate',
-                    default='none',
-                    metavar='',
-                    help='truncate mode [none (default), lastp, level]')
-parser.add_argument('-T', '--truncate-parameter',
-                    type=int,
-                    dest='truncate_p',
-                    default=10,
-                    metavar='',
-                    help='parameter p for truncate mode [default: 10]')
 parser.add_argument('-s', '--subset-groups',
                     type=str,
                     dest='subset',
                     default=None,
                     metavar='',
                     help='subset samples [format: column,set1,set2,...]')
-parser.add_argument('-S', '--fig-size',
-                    type=str,
-                    dest='fig_size',
-                    default='10x10',
+parser.add_argument('-r', '--remove-na-threshold',
+                    type=int,
+                    default=5,
+                    dest='remove_na_threshold',
                     metavar='',
-                    help='figure size [format: <width>x<height>]')
-parser.add_argument('-H', '--hide-statistics',
-                    dest='hide_stats',
-                    action='store_false',
-                    help='do not print statistics [default: False]')
-parser.add_argument('-P', '--plot-dendrogram',
-                    dest='plot_dendro',
-                    action='store_true',
-                    help='plot dendrogram [default: False]')
+                    help='remove rows/columns containing NAs >= threshold')
 args = parser.parse_args()
 
 # Analysis --------------------------------------------------------------------
 
-# Read distance matrix
-dist = pd.read_csv(args.input, sep='\t', index_col=0)
+# Read distancesance matrix
+distances = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
-dist = meta.remove_na(dist, threshold=args.remove_na_threshold)
+distances = meta.remove_na(distances, threshold=args.remove_na_threshold)
 
 # Add metadata (if appliable)
 if args.metadata_file is not None:
-    dist = meta.add_metadata(dist,
-                             args.metadata_file,
-                             args.metadata_id)
+    distances = meta.add_metadata(distances,
+                                  args.metadata_file,
+                                  args.metadata_id)
 
 # Subset groups (if applicable)
 if args.subset is not None:
@@ -130,34 +95,18 @@ if args.subset is not None:
             expression = False
 
         # Subset groups
-        dist = meta.filter_metadata(dist,
-                                    filter_col=sub_col,
-                                    filter_values=sub_sets,
-                                    expression=expression)
+        distances = meta.filter_metadata(distances,
+                                         filter_col=sub_col,
+                                         filter_values=sub_sets,
+                                         expression=expression)
 
-# BC dataset: remove low quality samples (if applicable)
-if 'low_quality' in args.filter:
-    dist = meta.filter_metadata(dist,
-                                filter_col='sample_quality',
-                                filter_values='ok')
-
-# BC dataset: remove bulk samples (if applicable)
-if 'bulk' in args.filter:
-    dist = meta.filter_metadata(dist,
-                                filter_col='sample_type',
-                                keep_values='single_cell')
-
-# Add groups to index for clustering (if applicable)
-dist, k = meta.set_index(dist, args.group_cols)
+# Add groups to index for clustering
+distances, k = meta.set_index(distances, args.group_cols)
 
 # Perform hierarchical clustering and plot
-heatmap.cluster_hierarchical(dist,
-                             args.output,
-                             args.linkage_method,
-                             print_statistics=args.hide_stats,
-                             plot_dendrogram=args.plot_dendro,
-                             truncate_mode=args.truncate,
-                             fig_size=args.fig_size,
-                             p=args.truncate_p,
-                             k=k,
-                             ct=args.colour_threshold)
+heatmap.cluster_hierarchical(distances=distances,
+                             output=args.output,
+                             method=args.linkage_method,
+                             print_ari=args.print_ari,
+                             no_plot=args.no_plot,
+                             k=k)

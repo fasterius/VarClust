@@ -77,23 +77,9 @@ def find_best_k(distances,
     return best_k
 
 
-def cluster_hierarchical(distances,
-                         output,
-                         method='complete',
-                         truncate_mode='none',
-                         print_statistics=True,
-                         plot_dendrogram=False,
-                         fig_size="10x10",
-                         p=10,
-                         k=1,
-                         ct=0):
-    "Cluster a distance matric with hierarchical clustering."
-
-    # Remove metadata
-    distances = remove_metadata(distances)
-
-    # Calcualate linkage
-    linkages = linkage(dist.squareform(distances), method=method)
+def calculate_ari(distances,
+                  linkages,
+                  k):
 
     # Get true labels
     cells_true = [index.split(': ')[0] for index in distances.index]
@@ -106,33 +92,35 @@ def cluster_hierarchical(distances,
     ari = sklearn.metrics.adjusted_rand_score(labels_true, labels_pred)
     ari = round(ari, 2)
 
+    # Return ARI
+    return ari
+
+
+def cluster_hierarchical(distances,
+                         output,
+                         method='complete',
+                         print_ari=False,
+                         no_plot=False,
+                         k=1):
+    "Cluster a distance matric with hierarchical clustering."
+
+    # Remove metadata
+    distances = remove_metadata(distances)
+
+    # Calcualate linkage
+    linkages = linkage(dist.squareform(distances), method=method)
+
+    # Calculate ARI
+    ari = calculate_ari(distances, linkages, k)
+
     # Print statistics (if applicable)
-    if print_statistics:
-
-        # Gather statistics
+    if print_ari:
         n_samples = str(len(distances))
-        out = output.split('/')[-1].replace('dendrogram.', '').split('.')
-        out_dataset = out[0]
-        out_metric = out[1]
-        out_merge = out[2]
-        out_subset = out[3]
-        out_group = out[4]
-        out_filter = out[5]
+        out = output + '\t' + n_samples + '\t' + ari
+        print(out)
 
-        # Print statistics to STDOUT
-        out_string = out_dataset + '\t' + \
-            n_samples + '\t' + \
-            out_metric + '\t' + \
-            out_merge + '\t' + \
-            out_subset + '\t' + \
-            out_group + '\t' +\
-            out_filter + '\t' + \
-            method + '\t' + \
-            str(ari)
-        print(out_string)
-
-    # Plot dendrogram
-    if plot_dendrogram:
+    # Plot dendrogram (if applicable)
+    if not no_plot:
 
         # Get groups from index for colouring
         colours = pd.DataFrame(distances.index)
