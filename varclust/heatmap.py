@@ -116,7 +116,7 @@ def cluster_hierarchical(distances,
     # Print statistics (if applicable)
     if print_ari:
         n_samples = str(len(distances))
-        out = output + '\t' + n_samples + '\t' + ari
+        out = output + '\t' + str(n_samples) + '\t' + str(ari)
         print(out)
 
     # Plot dendrogram (if applicable)
