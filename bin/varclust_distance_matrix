@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import varclust.read_profiles as readp
-import varclust.distance_matrix as dist
+import varclust.distances as dist
 
 # Argument parser -------------------------------------------------------------
 
@@ -26,12 +26,24 @@ parser.add_argument('-S', '--subset_values',
                     default=None,
                     metavar='',
                     help='list of value(s) to subset variants on')
-parser.add_argument('-l', '--unique-level',
+parser.add_argument('-m', '--merge_by',
                     type=str,
-                    dest='unique_level',
+                    dest='merge_by',
                     default='gene',
                     metavar='',
-                    help='unique variant level: gene [default] or position')
+                    help='merge variants by unique gene [default] or position')
+parser.add_argument('-a', '--similarity_param_a',
+                    type=int,
+                    dest='similarity_param_a',
+                    default=1,
+                    metavar='',
+                    help='similarity score parameter \"a\"')
+parser.add_argument('-b', '--similarity_param_b',
+                    type=int,
+                    dest='similarity_param_b',
+                    default=5,
+                    metavar='',
+                    help='similarity score parameter \"b\"')
 parser.add_argument('-n', '--normalise',
                     action='store_true',
                     dest='normalise',
@@ -50,13 +62,16 @@ else:
 
 # Read profiles
 profiles = readp.read_profile_dir(args.input_dir,
-                                  args.unique_level,
+                                  args.merge_by,
                                   subset_cols,
                                   subset_values)
 
 # Calculate distances
-distances = dist.calculate_distance_matrix(profiles,
-                                           normalise=args.normalise)
+distances = dist.create_matrix(profiles,
+                               merge_by=args.merge_by,
+                               a=args.similarity_param_a,
+                               b=args.similarity_param_b,
+                               normalise=args.normalise)
 
 # Save distances to file
 distances.to_csv(args.output, sep='\t')

@@ -14,7 +14,7 @@ def sort_genotype(row_data):
 
 
 def read_profile(file,
-                 by_unique='gene',
+                 merge_by='gene',
                  subset_cols=None,
                  subset_values=None):
     """Reads a SNV profile."""
@@ -34,12 +34,12 @@ def read_profile(file,
                 data = data.loc[data[col].isin(subset_values)]
 
     # Remove duplicated variants at specified level (if present)
-    if by_unique == 'gene':
+    if merge_by == 'gene':
         unique_level = ['chr', 'pos', 'ENSGID']
-    elif by_unique == 'position':
+    elif merge_by == 'position':
         unique_level = ['chr', 'pos']
     else:
-        raise ValueError('unique variant level specification \"' + by_unique +
+        raise ValueError('unique variant level specification \"' + merge_by +
                          '\" not valid; use \"gene\" or \"position\".')
     data = data.drop_duplicates(subset=unique_level)
 
@@ -57,7 +57,7 @@ def read_profile(file,
 
 
 def read_profile_dir(in_dir,
-                     by_unique='gene',
+                     merge_by='gene',
                      samples=None,
                      subset_cols=None,
                      subset_values=None):
@@ -68,7 +68,7 @@ def read_profile_dir(in_dir,
     files = [name for name in files if '.profile.txt' in name]
 
     # Calculate total profiles to read and initialise counter
-    nn_tot = min(len(files), len(samples))
+    nn_tot = len(files) if samples is None else len(samples)
     nn = 1
 
     # Read each profile and save in a dictionary
@@ -86,7 +86,7 @@ def read_profile_dir(in_dir,
         # Read profile and add to dictionary
         print('Reading profile for ' + sample + ' [' + str(nn) + ' / ' +
               str(nn_tot) + ']')
-        profiles[sample] = read_profile(file, by_unique, subset_cols,
+        profiles[sample] = read_profile(file, merge_by, subset_cols,
                                         subset_values)
 
         # Increment counter
