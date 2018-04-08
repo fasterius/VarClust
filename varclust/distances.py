@@ -4,14 +4,24 @@ import pandas as pd
 
 def calculate_distance(data_1,
                        data_2,
+                       merge_by='gene',
                        a=1,
                        b=5):
     """
     Calculates the similarity score distance between two given SNV profiles
     """
 
+    # Check merge level
+    if merge_by == 'gene':
+        merge_level = ['chr', 'pos', 'ENSGID']
+    elif merge_by == 'position':
+        merge_level = ['chr', 'pos']
+    else:
+        raise ValueError('invalid `merge_by` specification \"' + merge_by +
+                         '\"; please use \"gene\" or \"position\".')
+
     # Merge profiles
-    merged = pd.merge(data_1, data_2, on=['chr', 'pos'], how='inner')
+    merged = pd.merge(data_1, data_2, on=merge_level, how='inner')
     merged = merged.fillna(0)
 
     # Find number of matches
@@ -26,9 +36,12 @@ def calculate_distance(data_1,
     return distance
 
 
-def calculate_distance_matrix(profiles,
-                              normalise=False):
-    "Calculate distances for all combinations of provided samples"
+def create_matrix(profiles,
+                  merge_by='gene',
+                  a=1,
+                  b=5,
+                  normalise=False):
+    "Calculate a distance matrix for all provided samples."
 
     # Get all samples
     print('Calculating distances ...')
@@ -62,7 +75,10 @@ def calculate_distance_matrix(profiles,
                   ' / ' + str(nn_tot) + ']')
             try:
                 distance = calculate_distance(profiles[sample1],
-                                              profiles[sample2])
+                                              profiles[sample2],
+                                              merge_by,
+                                              a=a,
+                                              b=b)
             except:
                 print("Error: " + sample1 + " vs " + sample2)
                 continue
