@@ -53,8 +53,6 @@ def overlap_profiles(pseudo,
     pseudo = pseudo[merge_cols + [col + '_x' for col in meta_cols] + ['count']]
     pseudo.columns = merge_cols + meta_cols + ['count']
     pseudo = pseudo.drop_duplicates()
-    print(pseudo.columns)
-    quit()
 
     # Return pseudoprofile
     return pseudo
