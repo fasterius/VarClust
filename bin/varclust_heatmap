@@ -7,11 +7,11 @@ import varclust.heatmap as heatmap
 # Argument parser -------------------------------------------------------------
 
 parser = argparse.ArgumentParser(epilog='Hierarchically clusters and plots a '
-                                        'distancesance matrix using the '
+                                        'distance matrix using the '
                                         'chosen method.')
 parser.add_argument('input',
                     type=str,
-                    help='input distancesance matrix file path')
+                    help='input distance matrix file path')
 parser.add_argument('output',
                     type=str,
                     help='output image file path')
@@ -35,6 +35,12 @@ parser.add_argument('-M', '--metadata-id',
                     default='SRR',
                     metavar='',
                     help='metadata id column to merge on [default: SRR]')
+parser.add_argument('-c', '--output-clusters',
+                    type=str,
+                    dest='output_clusters',
+                    default=None,
+                    metavar='',
+                    help='file path for resulting cluster output')
 parser.add_argument('-l', '--linkage-method',
                     type=str,
                     dest='linkage_method',
@@ -64,7 +70,7 @@ args = parser.parse_args()
 
 # Analysis --------------------------------------------------------------------
 
-# Read distancesance matrix
+# Read distance matrix
 distances = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
@@ -106,6 +112,7 @@ distances, k = meta.set_index(distances, args.group_cols)
 # Perform hierarchical clustering and plot
 heatmap.cluster_hierarchical(distances=distances,
                              output=args.output,
+                             output_clusters=args.output_clusters,
                              method=args.linkage_method,
                              print_ari=args.print_ari,
                              no_plot=args.no_plot,
