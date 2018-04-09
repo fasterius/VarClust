@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='VarClust',
-      version='0.1.0',
+      version='0.1.1',
       description='Variant clustering of high throughput sequencing data',
       author='Erik Fasterius',
       author_email='erikfas@kth.se',
