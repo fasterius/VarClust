@@ -4,7 +4,8 @@ import varclust.read_profiles as readp
 
 def overlap_profiles(pseudo,
                      profile,
-                     merge_by='gene'):
+                     merge_by='gene',
+                     merge_method='inner'):
     """
     Overlaps and merge a pseudo-profiles and an SNV profile by the union of
     their matching SNVs.
@@ -30,21 +31,23 @@ def overlap_profiles(pseudo,
     meta_cols = list(all_cols.intersection(set(pseudo.columns)))
 
     # Merge profiles
-    pseudo = pd.merge(pseudo, profile, on=merge_cols, how='outer')
+    pseudo = pd.merge(pseudo, profile, on=merge_cols, how=merge_method)
 
     # Remove non-matching genotypes
     pseudo = pseudo.loc[(pseudo['genotype_x'] == pseudo['genotype_y']) |
                         pseudo['genotype_x'].isnull() |
                         pseudo['genotype_y'].isnull()]
 
+    # Increase variant counter
+    pseudo.loc[pseudo['genotype_x'].notnull() &
+               pseudo['genotype_y'].notnull(), 'count'] += 1
+    pseudo.loc[pseudo['genotype_x'].isnull() &
+               pseudo['genotype_y'].notnull(), 'count'] = 1
+
     # Move profile-unique rows to the pseudo columns
     for col in meta_cols:
         pseudo.loc[pseudo[col + '_x'].isnull(), col + '_x'] = \
             pseudo.loc[pseudo[col + '_x'].isnull(), col + '_y']
-
-    # Increase variant counter
-    pseudo.loc[pseudo['count'].isnull(), 'count'] = 0
-    pseudo['count'] = pseudo['count'] + 1
 
     # Remove redundant columns
     pseudo = pseudo[merge_cols + [col + '_x' for col in meta_cols] + ['count']]
@@ -64,6 +67,7 @@ def create_pseudo_profile(input_dir,
                           variant_subset_cols=None,
                           variant_subset_values=None,
                           merge_by='gene',
+                          merge_method='inner',
                           cutoff=10,
                           encoding='iso8859_16'):
     """
@@ -118,7 +122,10 @@ def create_pseudo_profile(input_dir,
     nn = 1
     for sample in samples[1:len(samples)]:
         print('Overlapping sample ' + str(nn) + ' / ' + str(len(profiles)-1))
-        pseudo = overlap_profiles(pseudo, profiles[sample], merge_by)
+        pseudo = overlap_profiles(pseudo,
+                                  profiles[sample],
+                                  merge_by,
+                                  merge_method)
         nn += 1
 
     # Add proportions of each variant in final pseudo-profile
