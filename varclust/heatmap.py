@@ -98,6 +98,7 @@ def calculate_ari(distances,
 
 def cluster_hierarchical(distances,
                          output,
+                         output_clusters=None,
                          method='complete',
                          print_ari=False,
                          no_plot=False,
@@ -119,7 +120,7 @@ def cluster_hierarchical(distances,
         out = output + '\t' + str(n_samples) + '\t' + str(ari)
         print(out)
 
-    # Plot dendrogram (if applicable)
+    # Plot heatmap (if applicable)
     if not no_plot:
 
         # Get groups from index for colouring
@@ -139,7 +140,6 @@ def cluster_hierarchical(distances,
 
         # Find the best k to use and add as additional row colours
         best_k = find_best_k(distances)
-        #  best_k = 11
         labels_k = fcluster(linkages, t=best_k, criterion='maxclust')
         sns.set_palette('Greys', best_k, 1)
         palette_k = sns.color_palette()
@@ -147,6 +147,15 @@ def cluster_hierarchical(distances,
         colour_map_k = dict(zip(groups_k, palette_k))
         colours_k = colours_index
         colours_k['label'] = labels_k
+
+        # Save cluster IDs (if applicable)
+        if output_clusters is not None:
+            clusters = colours_k[['label']]
+            clusters['id'] = clusters.index.str.split(': ', 1).str[1]
+            clusters = clusters[['id', 'label']]
+            clusters.columns = ['id', 'cluster']
+            clusters.to_csv(output_clusters, sep='\t', index=False)
+
         colours_k['cluster'] = colours_k['label'].map(colour_map_k)
         colours_k = colours_k.drop(axis=1, labels='label')
 
