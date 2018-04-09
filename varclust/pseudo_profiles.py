@@ -26,9 +26,9 @@ def overlap_profiles(pseudo,
                          '\" invalid; use \"gene\" or \"position\"')
 
     # Find available meta-columns
-    all_cols = set(['rsID', 'gene', 'impact', 'effect', 'feature', 'biotype',
-                    'genotype'])
-    meta_cols = list(all_cols.intersection(set(pseudo.columns)))
+    all_cols = ['rsID', 'gene', 'impact', 'effect', 'feature', 'biotype',
+                'genotype']
+    meta_cols = [x for x in all_cols if x in frozenset(pseudo.columns)]
 
     # Merge profiles
     pseudo = pd.merge(pseudo, profile, on=merge_cols, how=merge_method)
@@ -53,6 +53,8 @@ def overlap_profiles(pseudo,
     pseudo = pseudo[merge_cols + [col + '_x' for col in meta_cols] + ['count']]
     pseudo.columns = merge_cols + meta_cols + ['count']
     pseudo = pseudo.drop_duplicates()
+    print(pseudo.columns)
+    quit()
 
     # Return pseudoprofile
     return pseudo
