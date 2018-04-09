@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import varclust.create_profile as createp
+import varclust.create_profiles as createp
 
 # Argument parser -------------------------------------------------------------
 
