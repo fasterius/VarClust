@@ -56,15 +56,15 @@ parser.add_argument('-b', '--merge-by',
 parser.add_argument('-B', '--merge-method',
                     type=str,
                     dest='merge_method',
-                    default='inner',
+                    default='outer',
                     metavar='',
-                    help='merge method: inner [default] or outer merge')
+                    help='merge method: inner or outer [default] merge')
 parser.add_argument('-c', '--proportion-cutoff',
                     type=int,
                     dest='proportion_cutoff',
-                    default=10,
+                    default=0,
                     metavar='',
-                    help='proportion cutoff for genes/variants [default: 10]')
+                    help='proportion cutoff for genes/variants [default: 0]')
 parser.add_argument('-e', '--encoding',
                     type=str,
                     dest='encoding',

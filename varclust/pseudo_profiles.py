@@ -67,7 +67,7 @@ def create_pseudo_profile(input_dir,
                           variant_subset_values=None,
                           merge_by='gene',
                           merge_method='inner',
-                          cutoff=10,
+                          cutoff=0,
                           encoding='iso8859_16'):
     """
     Create a pseudo-profile of all the SNV profiles given in the input
