@@ -5,7 +5,7 @@ import varclust.read_profiles as readp
 def overlap_profiles(pseudo,
                      profile,
                      merge_by='gene',
-                     merge_method='inner'):
+                     merge_method='outer'):
     """
     Overlaps and merge a pseudo-profiles and an SNV profile by the union of
     their matching SNVs.
@@ -18,31 +18,30 @@ def overlap_profiles(pseudo,
 
     # Get columns to merge on
     if merge_by == 'gene':
-        merge_cols = ['chr', 'pos', 'ENSGID']
+        merge_cols = ['chr', 'pos', 'ENSGID', 'genotype']
     elif merge_by == 'position':
-        merge_cols = ['chr', 'pos']
+        merge_cols = ['chr', 'pos', 'genotype']
     else:
         raise ValueError('merge level specification \"' + merge_by +
                          '\" invalid; use \"gene\" or \"position\"')
 
     # Find available meta-columns
-    all_cols = ['rsID', 'gene', 'impact', 'effect', 'feature', 'biotype',
-                'genotype']
+    all_cols = ['rsID', 'gene', 'impact', 'effect', 'feature', 'biotype']
     meta_cols = [x for x in all_cols if x in frozenset(pseudo.columns)]
 
     # Merge profiles
     pseudo = pd.merge(pseudo, profile, on=merge_cols, how=merge_method)
 
-    # Remove non-matching genotypes
-    pseudo = pseudo.loc[(pseudo['genotype_x'] == pseudo['genotype_y']) |
-                        pseudo['genotype_x'].isnull() |
-                        pseudo['genotype_y'].isnull()]
+    #  # Remove non-matching genotypes
+    #  pseudo = pseudo.loc[(pseudo['genotype_x'] == pseudo['genotype_y']) |
+                        #  pseudo['genotype_x'].isnull() |
+                        #  pseudo['genotype_y'].isnull()]
 
     # Increase variant counter
-    pseudo.loc[pseudo['genotype_x'].notnull() &
-               pseudo['genotype_y'].notnull(), 'count'] += 1
-    pseudo.loc[pseudo['genotype_x'].isnull() &
-               pseudo['genotype_y'].notnull(), 'count'] = 1
+    pseudo.loc[pseudo['rsID_x'].notnull() &
+               pseudo['rsID_y'].notnull(), 'count'] += 1
+    pseudo.loc[pseudo['rsID_x'].isnull() &
+               pseudo['rsID_y'].notnull(), 'count'] = 1
 
     # Move profile-unique rows to the pseudo columns
     for col in meta_cols:
@@ -52,7 +51,7 @@ def overlap_profiles(pseudo,
     # Remove redundant columns
     pseudo = pseudo[merge_cols + [col + '_x' for col in meta_cols] + ['count']]
     pseudo.columns = merge_cols + meta_cols + ['count']
-    pseudo = pseudo.drop_duplicates()
+    pseudo = pseudo.drop_duplicates(subset=merge_cols)
 
     # Return pseudoprofile
     return pseudo
@@ -134,6 +133,7 @@ def create_pseudo_profile(input_dir,
     # Remove variants/genes below proportion cutoff
     pseudo = pseudo.loc[pseudo['proportion'] >= cutoff, ]
 
-    # Write to file
+    # Sort and write to file
+    pseudo = pseudo.sort_values(by='count', axis=0, ascending=False)
     pseudo.to_csv(output_file, sep='\t', index=False)
     print('Done.')
