@@ -2,15 +2,15 @@
 import argparse
 import pandas as pd
 import varclust.metadata as meta
-import varclust.tsne as tsne
+import varclust.cluster as cluster
 
 # Argument parser -------------------------------------------------------------
 
-parser = argparse.ArgumentParser(epilog='tsnes and plots a distancesance matrix '
+parser = argparse.ArgumentParser(epilog='tsnes and plots a distance matrix '
                                         'using the tSNE tsneing method.')
 parser.add_argument('input',
                     type=str,
-                    help='input distancesance matrix file path')
+                    help='input distance matrix file path')
 parser.add_argument('output',
                     type=str,
                     help='output image file path')
@@ -72,7 +72,7 @@ args = parser.parse_args()
 
 # Analysis --------------------------------------------------------------------
 
-# Read distancesance matrix
+# Read distance matrix
 distances = pd.read_csv(args.input, sep='\t', index_col=0)
 
 # Remove NAs
@@ -109,14 +109,14 @@ if args.subset is not None:
                                          expression=expression)
 
 # Perform tSNE
-clust = tsne.tSNE(distances=distances,
-                  learning_rate=args.learning_rate,
-                  perplexity=args.perplexity)
+clust = cluster.tSNE(distances=distances,
+                     learning_rate=args.learning_rate,
+                     perplexity=args.perplexity)
 
 # Plot tSNE
-plot = tsne.plot_tSNE(tsne=clust,
-                      distances=distances,
-                      output=args.output,
-                      alpha=args.alpha,
-                      colour_cols=args.colour_col,
-                      shape_cols=args.shape_col)
+plot = cluster.plot_tSNE(tsne=clust,
+                         distances=distances,
+                         output=args.output,
+                         alpha=args.alpha,
+                         colour_cols=args.colour_col,
+                         shape_cols=args.shape_col)

@@ -2,7 +2,7 @@
 import argparse
 import pandas as pd
 import varclust.metadata as meta
-import varclust.heatmap as heatmap
+import varclust.cluster as cluster
 
 # Argument parser -------------------------------------------------------------
 
@@ -110,7 +110,7 @@ if args.subset is not None:
 distances, k = meta.set_index(distances, args.group_cols)
 
 # Perform hierarchical clustering and plot
-heatmap.cluster_hierarchical(distances=distances,
+cluster.cluster_hierarchical(distances=distances,
                              output=args.output,
                              output_clusters=args.output_clusters,
                              method=args.linkage_method,
