@@ -43,14 +43,11 @@ def read_profile(file,
                          '\" not valid; use \"gene\" or \"position\".')
     data = data.drop_duplicates(subset=unique_level)
 
-    # Merge alleles into genotypes
-    data['genotype'] = data['A1'] + data['A2']
-
-    # Sort genotypes
-    data = data.apply(sort_genotype, axis=1)
-
-    # Drop allele columns
-    data = data.drop(columns=['A1', 'A2'])
+    # Merge and sort alleles into genotypes (if not already done)
+    if 'genotype' not in data.columns:
+        data['genotype'] = data['A1'] + data['A2']
+        data = data.apply(sort_genotype, axis=1)
+        data = data.drop(columns=['A1', 'A2'])
 
     # Return final dataframe
     return data
