@@ -102,8 +102,9 @@ def calculate_ari(distances,
 
 def cluster_hierarchical(distances,
                          output,
-                         output_clusters=None,
-                         method='complete',
+                         cluster_groups=False,
+                         cluster_output=None,
+                         method='ward',
                          print_ari=False,
                          no_plot=False,
                          k=1):
@@ -143,29 +144,33 @@ def cluster_hierarchical(distances,
         colours['group'] = colours['label'].map(colour_map)
         colours = colours.drop(axis=1, labels='label')
 
-        # Find the best k to use and add as additional row colours
-        best_k = find_best_k(distances)
-        labels_k = fcluster(linkages, t=best_k, criterion='maxclust')
-        sns.set_palette('Greys', best_k, 1)
-        palette_k = sns.color_palette()
-        groups_k = set(labels_k)
-        colour_map_k = dict(zip(groups_k, palette_k))
-        colours_k = colours_index
-        colours_k['label'] = labels_k
+        # Find the best k to use and add as additional groups (if applicable)
+        if cluster_groups:
+            best_k = find_best_k(distances)
+            labels_k = fcluster(linkages, t=best_k, criterion='maxclust')
+            sns.set_palette('Greys', best_k, 1)
+            palette_k = sns.color_palette()
+            groups_k = set(labels_k)
+            colour_map_k = dict(zip(groups_k, palette_k))
+            colours_k = colours_index
+            colours_k['label'] = labels_k
 
-        # Save cluster IDs (if applicable)
-        if output_clusters is not None:
-            clusters = colours_k[['label']]
-            clusters['id'] = clusters.index.str.split(': ', 1).str[1]
-            clusters = clusters[['id', 'label']]
-            clusters.columns = ['id', 'cluster']
-            clusters.to_csv(output_clusters, sep='\t', index=False)
+            # Save cluster IDs (if applicable)
+            if cluster_output is not None:
+                clusters = colours_k[['label']]
+                clusters['id'] = clusters.index.str.split(': ', 1).str[1]
+                clusters = clusters[['id', 'label']]
+                clusters.columns = ['id', 'cluster']
+                clusters.to_csv(cluster_output, sep='\t', index=False)
 
-        colours_k['cluster'] = colours_k['label'].map(colour_map_k)
-        colours_k = colours_k.drop(axis=1, labels='label')
+            colours_k['cluster'] = colours_k['label'].map(colour_map_k)
+            colours_k = colours_k.drop(axis=1, labels='label')
 
-        # Combine both row colours
-        row_colours = [colours_k['cluster'], colours['group']]
+            # Combine both row colours
+            row_colours = [colours_k['cluster'], colours['group']]
+
+        else:
+            row_colours = [colours['group']]
 
         # Plot figure
         cp = sns.clustermap(distances,

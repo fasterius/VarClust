@@ -23,6 +23,10 @@ parser.add_argument('-n', '--no-plot',
                     dest='no_plot',
                     action='store_true',
                     help='do not plot the heatmap')
+parser.add_argument('-c', '--cluster-groups',
+                    action='store_true',
+                    dest='cluster_groups',
+                    help='perform clustering [default: false]')
 parser.add_argument('-m', '--metadata-file',
                     type=str,
                     dest='metadata_file',
@@ -35,19 +39,19 @@ parser.add_argument('-M', '--metadata-id',
                     default='SRR',
                     metavar='',
                     help='metadata id column to merge on [default: SRR]')
-parser.add_argument('-c', '--output-clusters',
+parser.add_argument('-C', '--cluster-output',
                     type=str,
-                    dest='output_clusters',
+                    dest='cluster_output',
                     default=None,
                     metavar='',
                     help='file path for resulting cluster output')
 parser.add_argument('-l', '--linkage-method',
                     type=str,
                     dest='linkage_method',
-                    default='complete',
+                    default='ward',
                     metavar='',
-                    help='[complete (default), single, average, centroid, '
-                         'median, ward, weighted]')
+                    help='complete, single, average, centroid, '
+                         'median, ward [default] or weighted')
 parser.add_argument('-g', '--group-cols',
                     type=str,
                     dest='group_cols',
@@ -112,7 +116,8 @@ distances, k = meta.set_index(distances, args.group_cols)
 # Perform hierarchical clustering and plot
 cluster.cluster_hierarchical(distances=distances,
                              output=args.output,
-                             output_clusters=args.output_clusters,
+                             cluster_groups=args.cluster_groups,
+                             cluster_output=args.cluster_output,
                              method=args.linkage_method,
                              print_ari=args.print_ari,
                              no_plot=args.no_plot,
