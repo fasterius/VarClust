@@ -121,7 +121,8 @@ def cluster_hierarchical(distances,
     # Print statistics (if applicable)
     if print_ari:
         n_samples = str(len(distances))
-        out = output + '\t' + str(n_samples) + '\t' + str(ari)
+        out_file = output.split('/')[-1].replace('.png', '')
+        out = out_file + '\t' + str(n_samples) + '\t' + str(ari)
         print(out)
 
     # Plot heatmap (if applicable)
@@ -183,7 +184,6 @@ def cluster_hierarchical(distances,
         cp.cax.set_title('Z-score', loc='left')
 
         # Add colour legend for groups
-        #  all_labels = groups.tolist() + list(groups_k)
         all_labels = groups
         for label in all_labels:
             try:
