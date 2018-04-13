@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import varclust.create_profiles as createp
+import varclust.profiles as profiles
 
 # Argument parser -------------------------------------------------------------
 
@@ -29,7 +29,7 @@ args = parser.parse_args()
 # Analysis --------------------------------------------------------------------
 
 # Create profiles
-createp.create_profiles_in_dir(args.input_dir,
-                               args.output_dir,
-                               args.filter_depth,
-                               args.method)
+profiles.create_profiles_in_dir(args.input_dir,
+                                args.output_dir,
+                                args.filter_depth,
+                                args.method)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import varclust.pseudo_profiles as pseudo
+import varclust.profiles as profiles
 
 # Argument parser -------------------------------------------------------------
 
@@ -94,15 +94,15 @@ else:
     variant_subset_values = None
 
 # Create pseudo-profile
-pseudo.create_pseudo_profile(args.input_dir,
-                             args.output_file,
-                             args.metadata,
-                             args.metadata_id_col,
-                             sample_subset_cols,
-                             sample_subset_values,
-                             variant_subset_cols,
-                             variant_subset_values,
-                             args.merge_by,
-                             args.merge_method,
-                             args.proportion_cutoff,
-                             args.encoding)
+profiles.create_pseudo_profile(args.input_dir,
+                               args.output_file,
+                               args.metadata,
+                               args.metadata_id_col,
+                               sample_subset_cols,
+                               sample_subset_values,
+                               variant_subset_cols,
+                               variant_subset_values,
+                               args.merge_by,
+                               args.merge_method,
+                               args.proportion_cutoff,
+                               args.encoding)
