@@ -1,13 +1,14 @@
-import sklearn
 import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.spatial.distance as dist
+from varclust.metadata import remove_metadata
+from scipy.cluster.hierarchy import linkage, fcluster
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import adjusted_rand_score
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
-from scipy.cluster.hierarchy import linkage, fcluster
-from varclust.metadata import remove_metadata
 
 
 # Heatmap-related functions
@@ -86,13 +87,13 @@ def calculate_ari(distances,
 
     # Get true labels
     cells_true = [index.split(': ')[0] for index in distances.index]
-    le = sklearn.preprocessing.LabelEncoder()
+    le = LabelEncoder()
     le.fit(cells_true)
     labels_true = le.transform(cells_true)
 
     # Calculate ARI
     labels_pred = fcluster(linkages, t=k, criterion='maxclust')
-    ari = sklearn.metrics.adjusted_rand_score(labels_true, labels_pred)
+    ari = adjusted_rand_score(labels_true, labels_pred)
     ari = round(ari, 2)
 
     # Return ARI
