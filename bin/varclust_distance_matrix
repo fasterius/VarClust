@@ -61,10 +61,10 @@ else:
     subset_values = None
 
 # Read profiles
-profile_list = profiles.read_profile_dir(args.input_dir,
-                                         args.merge_by,
-                                         subset_cols,
-                                         subset_values)
+profile_list = profiles.read_profile_dir(in_dir=args.input_dir,
+                                         merge_by=args.merge_by,
+                                         subset_cols=subset_cols,
+                                         subset_values=subset_values)
 
 # Calculate distances
 distances = dist.create_matrix(profile_list,

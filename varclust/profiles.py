@@ -348,7 +348,7 @@ def read_profile_dir(in_dir,
         nn += 1
 
     # Return profiles
-    print('done.')
+    print('Done.')
     return profiles
 
 
