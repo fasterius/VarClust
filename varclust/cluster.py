@@ -13,73 +13,6 @@ from sklearn.manifold import TSNE
 
 # Heatmap-related functions
 
-def find_best_k(distances,
-                max_k=20):
-    "Finds the optimal number of cluster using k-means with the elbow method."
-
-    # Calculate errors per k
-    cluster_errors = []
-    cluster_range = range(1, min(max_k, distances.shape[0]))
-    for n_clusters in cluster_range:
-        clusters = KMeans(n_clusters)
-        clusters.fit(distances)
-        cluster_errors.append(clusters.inertia_)
-
-    # Get coordinates of all the points
-    n_points = len(cluster_errors)
-    coords = np.vstack((range(1, n_points + 1), cluster_errors)).T
-    first_point = coords[0]
-
-    # Get vector between first and last point - this is the line
-    line_vector = coords[-1] - coords[0]
-
-    # normalize the line vector
-    line_norm = line_vector / np.sqrt(np.sum(line_vector**2))
-
-    # find the distance from each point to the line:
-    # vector between all points and first point
-    dist_from_first = coords - first_point
-
-    # To calculate the distance to the line, we split dist_from_first into two
-    # components, one that is parallel to the line and one that is
-    # perpendicular. Then, we take the norm of the part that is perpendicular
-    # to the line and get the distance.
-    # We find the vector parallel to the line by projecting dist_from_first on
-    # the line. The perpendicular vector is dist_from_first - parallel_vector
-    # We project dist_from_first by taking the scalar product of the vector
-    # with the unit vector that points in the direction of the line (this gives
-    # us the length of the projection of dist_from_first onto the line). If we
-    # multiply the scalar product by the unit vector, we have
-    # parallel_vector
-    scalar_product = np.sum(dist_from_first * np.matlib.repmat(line_norm,
-                                                               n_points, 1),
-                            axis=1)
-    parallel_vector = np.outer(scalar_product, line_norm)
-    vector_to_line = dist_from_first - parallel_vector
-
-    # distance to line is the norm of vector_to_line
-    dist_to_line = np.sqrt(np.sum(vector_to_line ** 2, axis=1))
-
-    # now all you need is to find the maximum
-    idx_best = np.argmax(dist_to_line)
-    best_k = int(coords[idx_best, 0])
-    best_coord_x = coords[idx_best, 0]
-    best_coord_y = coords[idx_best, 1]
-
-    # Plot
-    data = pd.DataFrame(cluster_errors, index=cluster_range, columns=['error'])
-    plt.figure()
-    plt.plot(data, linestyle='-', marker='o', markersize=4)
-    plt.xlabel('k')
-    plt.ylabel('Sum-of-squared error')
-    plt.scatter(x=best_coord_x, y=best_coord_y, color='black', s=60)
-    plt.annotate('k = ' + str(best_k), xy=(best_coord_x + 0.5,
-                                           best_coord_y + 0.5))
-    plt.savefig("elbow.png")
-
-    # Return the best k value
-    return best_k
-
 
 def calculate_ari(distances,
                   linkages,
@@ -100,10 +33,89 @@ def calculate_ari(distances,
     return ari
 
 
+def find_cluster_k(distances,
+                   choose_k="geometric",
+                   max_k=20):
+    "Finds the optimal number of cluster using k-means with the elbow method."
+
+    # Calculate errors per k
+    cluster_errors = []
+    cluster_range = range(1, min(max_k, distances.shape[0]))
+    for n_clusters in cluster_range:
+        clusters = KMeans(n_clusters)
+        clusters.fit(distances)
+        cluster_errors.append(clusters.inertia_)
+
+    # Plot
+    data = pd.DataFrame(cluster_errors, index=cluster_range, columns=['error'])
+    plt.figure()
+    plt.plot(data, linestyle='-', marker='o', markersize=4)
+    plt.xlabel('k')
+    plt.ylabel('Sum-of-squared error')
+
+    if choose_k == 'geometric':
+
+        # Get coordinates of all the points
+        n_points = len(cluster_errors)
+        coords = np.vstack((range(1, n_points + 1), cluster_errors)).T
+        first_point = coords[0]
+
+        # Get vector between first and last point - this is the line
+        line_vector = coords[-1] - coords[0]
+
+        # normalize the line vector
+        line_norm = line_vector / np.sqrt(np.sum(line_vector**2))
+
+        # find the distance from each point to the line:
+        # vector between all points and first point
+        dist_from_first = coords - first_point
+
+        # To calculate the distance to the line, we split dist_from_first into two
+        # components, one that is parallel to the line and one that is
+        # perpendicular. Then, we take the norm of the part that is perpendicular
+        # to the line and get the distance.
+        # We find the vector parallel to the line by projecting dist_from_first on
+        # the line. The perpendicular vector is dist_from_first - parallel_vector
+        # We project dist_from_first by taking the scalar product of the vector
+        # with the unit vector that points in the direction of the line (this gives
+        # us the length of the projection of dist_from_first onto the line). If we
+        # multiply the scalar product by the unit vector, we have
+        # parallel_vector
+        scalar_product = \
+            np.sum(dist_from_first * np.matlib.repmat(line_norm,
+                                                      n_points, 1), axis=1)
+        parallel_vector = np.outer(scalar_product, line_norm)
+        vector_to_line = dist_from_first - parallel_vector
+
+        # distance to line is the norm of vector_to_line
+        dist_to_line = np.sqrt(np.sum(vector_to_line ** 2, axis=1))
+
+        # now all you need is to find the maximum
+        idx_best = np.argmax(dist_to_line)
+        cluster_k = int(coords[idx_best, 0])
+        best_coord_x = coords[idx_best, 0]
+        best_coord_y = coords[idx_best, 1]
+
+        plt.scatter(x=best_coord_x, y=best_coord_y, color='black', s=60)
+        plt.annotate('k = ' + str(cluster_k), xy=(best_coord_x + 0.5,
+                                                  best_coord_y + 0.5))
+        plt.savefig("elbow.png")
+
+    else:
+
+        # Plot and ask for user to choose k
+        plt.show(block=False)
+        cluster_k = int(input('Choose k: '))
+
+    # Return the best k value
+    return cluster_k
+
+
 def cluster_hierarchical(distances,
                          output,
                          cluster_groups=False,
                          cluster_output=None,
+                         choose_k='geometric',
                          method='ward',
                          print_ari=False,
                          no_plot=False,
@@ -146,9 +158,13 @@ def cluster_hierarchical(distances,
 
         # Find the best k to use and add as additional groups (if applicable)
         if cluster_groups:
-            best_k = find_best_k(distances)
-            labels_k = fcluster(linkages, t=best_k, criterion='maxclust')
-            sns.set_palette('Greys', best_k, 1)
+
+            # Find/choose k
+            cluster_k = find_cluster_k(distances, choose_k=choose_k)
+
+            # Add labels
+            labels_k = fcluster(linkages, t=cluster_k, criterion='maxclust')
+            sns.set_palette('Greys', cluster_k, 1)
             palette_k = sns.color_palette()
             groups_k = set(labels_k)
             colour_map_k = dict(zip(groups_k, palette_k))
