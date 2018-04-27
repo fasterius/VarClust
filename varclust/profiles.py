@@ -440,7 +440,7 @@ def create_pseudo_profile(input_dir,
         # Subset metadata (if applicable)
         if sample_subset_cols is not None and sample_subset_values is not None:
             mask = metadata[sample_subset_cols].isin(sample_subset_values)\
-                    .any(axis=1)
+                    .all(axis=1)
             metadata = metadata.loc[mask]
         elif (sample_subset_cols is None and
               sample_subset_values is not None) or \
