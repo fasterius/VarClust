@@ -34,6 +34,7 @@ def calculate_ari(distances,
 
 
 def find_cluster_k(distances,
+                   output,
                    choose_k="geometric",
                    max_k=20):
     "Finds the optimal number of cluster using k-means with the elbow method."
@@ -99,7 +100,7 @@ def find_cluster_k(distances,
         plt.scatter(x=best_coord_x, y=best_coord_y, color='black', s=60)
         plt.annotate('k = ' + str(cluster_k), xy=(best_coord_x + 0.5,
                                                   best_coord_y + 0.5))
-        plt.savefig("elbow.png")
+        plt.savefig(output.replace('.png', '.elbow.png'))
 
     else:
 
@@ -160,7 +161,7 @@ def cluster_hierarchical(distances,
         if cluster_groups:
 
             # Find/choose k
-            cluster_k = find_cluster_k(distances, choose_k=choose_k)
+            cluster_k = find_cluster_k(distances, output, choose_k=choose_k)
 
             # Add labels
             labels_k = fcluster(linkages, t=cluster_k, criterion='maxclust')
