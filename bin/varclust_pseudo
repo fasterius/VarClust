@@ -7,7 +7,7 @@ import varclust.profiles as profiles
 parser = argparse.ArgumentParser(epilog='Create pseudo-profile(s).')
 parser.add_argument('input_dir',
                     type=str,
-                    help='input directory path containing the VCF files')
+                    help='input directory path containing SNV profiles')
 parser.add_argument('output_file',
                     type=str,
                     help='pseudo-profile output file path')

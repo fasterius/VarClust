@@ -6,8 +6,8 @@ import varclust.cluster as cluster
 
 # Argument parser -------------------------------------------------------------
 
-parser = argparse.ArgumentParser(epilog='tsnes and plots a distance matrix '
-                                        'using the tSNE tsneing method.')
+parser = argparse.ArgumentParser(epilog='Clusters and plots a distance matrix '
+                                        'using tSNE.')
 parser.add_argument('input',
                     type=str,
                     help='input distance matrix file path')
