@@ -100,7 +100,7 @@ def find_cluster_k(distances,
         plt.scatter(x=best_coord_x, y=best_coord_y, color='black', s=60)
         plt.annotate('k = ' + str(cluster_k), xy=(best_coord_x + 0.5,
                                                   best_coord_y + 0.5))
-        plt.savefig(output.replace('.png', '.elbow.png'))
+        plt.savefig(output.replace('.png', '.elbow.png'), dpi=300)
 
     else:
 
