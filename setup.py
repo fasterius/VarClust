@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(name='VarClust',
       version='0.2.1',
-      description='Variant clustering of high throughput sequencing data',
+      description='Variant clustering of high-throughput sequencing data',
       author='Erik Fasterius',
-      author_email='erikfas@kth.se',
+      author_email='erik.fasterius@outlook.com',
       url='http://github.com/fasterius/varclust',
       license='MIT',
       packages=['varclust'],
