@@ -2,13 +2,13 @@
 
 [![License: MIT][1]][2]
 
-`VarClust` is a Python package performs clustering of high-throughput
+`VarClust` is a Python package that performs clustering of high-throughput
 sequencing (HTS) data using single nucleotide variants (SNVs). `VarClust`
 analyses variants stored in [VCF files][3], which are the output of variant
 callers such as the [Genome Analysis ToolKit][4]. While `VarClust` was
 developed for the analysis of single cell RNA sequencing (scRNA-seq) data, any
-variant data stored in VCF files may be analysed whether it originates in DNA-
-or RNA-based methods.
+variant data stored in VCF files may be analysed regardless of whether it
+originates in DNA- or RNA-based methods.
 
 ## Installation
 
