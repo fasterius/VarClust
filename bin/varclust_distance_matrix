@@ -38,7 +38,7 @@ parser.add_argument('-M', '--metric',
                     default='similarity_score',
                     metavar='',
                     help='distance metric [similarity_score (default), ' +
-                        'concordance, edit_distance]')
+                        'concordance, levenshtein]')
 parser.add_argument('-a', '--similarity_param_a',
                     type=int,
                     dest='similarity_param_a',

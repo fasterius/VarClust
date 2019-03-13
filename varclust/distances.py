@@ -41,7 +41,7 @@ def calculate_distance(data_1,
         # Calculate similarity score or concordance
         distance = 1 - (n_matches + a) / (n_total + a + b)
 
-    elif metric == 'edit_distance':
+    elif metric == 'levenshtein':
 
         # Create per-sample genotype strings
         x = merged[['genotype_x']].to_string(header=False, index=False,
