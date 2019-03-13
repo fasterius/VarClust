@@ -41,7 +41,7 @@ def calculate_distance(data_1,
         # Calculate similarity score or concordance
         distance = 1 - (n_matches + a) / (n_total + a + b)
 
-    elif metric == 'levenshtein':
+    elif metric == 'hamming' or metric == 'levenshtein':
 
         # Create per-sample genotype strings
         x = merged[['genotype_x']].to_string(header=False, index=False,
@@ -51,8 +51,15 @@ def calculate_distance(data_1,
         string_x = ''.join([''.join(element.split()) for element in x])
         string_y = ''.join([''.join(element.split()) for element in y])
 
-        # Calculate edit distance
-        distance = editdistance.eval(string_x, string_y)
+        if metric == 'levenshtein':
+
+            # Calculate Levenshtein distance
+            distance = editdistance.eval(string_x, string_y)
+
+        else:
+
+            # Calculate Hamming distance
+            distance = sum(c1 != c2 for c1, c2 in zip(string_x, string_y))
 
     else:
         raise ValueError('invalid `metric` specification \"' + metric +
