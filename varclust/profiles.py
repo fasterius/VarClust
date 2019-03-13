@@ -278,7 +278,7 @@ def read_profile(file,
     """Reads a SNV profile."""
 
     # Read file with pandas
-    data = pd.read_table(file, sep='\t')
+    data = pd.read_csv(file, sep='\t')
 
     # Drop non-standard chromosomes
     standard = ['chr' + str(chr) for chr in range(1, 23)]
