@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import editdistance
 
 
 def calculate_distance(data_1,
@@ -39,6 +40,19 @@ def calculate_distance(data_1,
 
         # Calculate similarity score or concordance
         distance = 1 - (n_matches + a) / (n_total + a + b)
+
+    elif metric == 'edit_distance':
+
+        # Create per-sample genotype strings
+        x = merged[['genotype_x']].to_string(header=False, index=False,
+                                             index_names=False).split('\n')
+        y = merged[['genotype_y']].to_string(header=False, index=False,
+                                             index_names=False).split('\n')
+        string_x = ''.join([''.join(element.split()) for element in x])
+        string_y = ''.join([''.join(element.split()) for element in y])
+
+        # Calculate edit distance
+        distance = editdistance.eval(string_x, string_y)
 
     else:
         raise ValueError('invalid `metric` specification \"' + metric +

@@ -17,6 +17,7 @@ setup(name='VarClust',
       ],
       install_requires=[
           'argparse',
+          'editdistance',
           'pandas',
           'pyvcf',
           'numpy',
