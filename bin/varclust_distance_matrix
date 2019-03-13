@@ -32,6 +32,12 @@ parser.add_argument('-m', '--merge_by',
                     default='gene',
                     metavar='',
                     help='merge variants by unique gene [default] or position')
+parser.add_argument('-M', '--metric',
+                    type=str,
+                    dest='metric',
+                    default='similarity_score',
+                    metavar='',
+                    help='distance metric [similarity_score, concordance]')
 parser.add_argument('-a', '--similarity_param_a',
                     type=int,
                     dest='similarity_param_a',
@@ -68,6 +74,7 @@ profile_list = profiles.read_profile_dir(in_dir=args.input_dir,
 
 # Calculate distances
 distances = dist.create_matrix(profile_list,
+                               metric=args.metric,
                                merge_by=args.merge_by,
                                a=args.similarity_param_a,
                                b=args.similarity_param_b,

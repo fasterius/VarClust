@@ -4,6 +4,7 @@ import pandas as pd
 
 def calculate_distance(data_1,
                        data_2,
+                       metric='similarity_score',
                        merge_by='gene',
                        a=1,
                        b=5):
@@ -24,19 +25,32 @@ def calculate_distance(data_1,
     merged = pd.merge(data_1, data_2, on=merge_level, how='inner')
     merged = merged.fillna(0)
 
-    # Find number of matches
-    matches = merged.loc[merged['genotype_x'] == merged['genotype_y']]
-    n_matches = matches.shape[0]
+    # Calculate distance matrix using supplied metric
+    if metric == 'similarity_score' or metric == 'concordance':
 
-    # Calculate similarity score
-    n_total = merged.shape[0]
-    distance = 1 - (n_matches + a) / (n_total + a + b)
+        # Find number of matches and total variants
+        matches = merged.loc[merged['genotype_x'] == merged['genotype_y']]
+        n_matches = matches.shape[0]
+        n_total = merged.shape[0]
+
+        # Set a and b to 0 for concordance
+        if metric == 'concordance':
+            a = b = 0
+
+        # Calculate similarity score or concordance
+        distance = 1 - (n_matches + a) / (n_total + a + b)
+
+    else:
+        raise ValueError('invalid `metric` specification \"' + metric +
+                         '\"; please use \"similarity_score\" or ' +
+                         '\"concordance\".')
 
     # Return distance measure
     return distance
 
 
 def create_matrix(profiles,
+                  metric='similarity_score',
                   merge_by='gene',
                   a=1,
                   b=5,
@@ -74,9 +88,10 @@ def create_matrix(profiles,
             print('Comparing ' + sample1 + ' and ' + sample2 + ' [' + str(nn) +
                   ' / ' + str(nn_tot) + ']')
             try:
-                distance = calculate_distance(profiles[sample1],
-                                              profiles[sample2],
-                                              merge_by,
+                distance = calculate_distance(data_1=profiles[sample1],
+                                              data_2=profiles[sample2],
+                                              metric=metric,
+                                              merge_by=merge_by,
                                               a=a,
                                               b=b)
             except:
