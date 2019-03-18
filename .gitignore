@@ -1,6 +1,7 @@
 *.un~
 *.pyc
 *.egg-info
+*-env
 .DS_Store
 dist/
 test/
