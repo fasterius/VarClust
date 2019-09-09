@@ -20,8 +20,8 @@ pip install git+https://github.com/fasterius/VarClust
 
 ## Usage
 
-While `VarClust` is a Python package and may thus be utilised as such (*i.e.* by
-importing it and using each included function as desired), its main
+While `VarClust` is a Python package and may thus be utilised as such (*i.e.*
+by importing it and using each included function as desired), its main
 interface is through the command line. It has five modules, each performing a
 separate function: creation of SNV profiles, calculation of genetic distance
 matrices, aggregation of specified profiles into "pseudo-profiles" and, lastly,
@@ -36,7 +36,10 @@ distance calculation (*e.g* excluding variants present in the dbSNP database
 or those that do not pass some quality threshold).
 
 Given a directory of single-sample VCF files, the first step is to create an
-SNV profile for each:
+SNV profile for each. This can be done using the following code, but requires
+that the filename is identical to the sample in the VCF (minus the `.vcf` or
+`.vcf.gz` suffixes). For example, a file named `sample_1.vcf` contains the
+sample `sample_1`.
 
 ```bash
 varclust_create_profiles <VCF directory> <output profile directory>
