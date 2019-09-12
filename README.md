@@ -45,8 +45,15 @@ sample `sample_1`.
 varclust_create_profiles <VCF directory> <output profile directory>
 ```
 
-A pairwise distance matrix for the genetic similarities between each sample
-must then be calculated:
+*(Keep in mind that the command line-version of VarClust can only create
+profiles for single-sample VCF files (whether that sample be a single cell or
+bulk sequencing), following the naming scheme previously mentioned. The
+lower-level python module has functions for dealing with multi-sample VCFs,
+though, so you are also free to use those if they are   more suitable for your
+needs.)* 
+
+The next step is to create a pairwise distance matrix for the genetic
+similarities between each sample:
 
 ```bash
 varclust_distance_matrix <profile directory> <output distance matrix path>
