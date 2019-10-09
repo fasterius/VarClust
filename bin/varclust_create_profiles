@@ -4,8 +4,11 @@ import varclust.profiles as profiles
 
 # Argument parser -------------------------------------------------------------
 
-parser = argparse.ArgumentParser(epilog='Creates SNV profiles for each VCF in'
-                                        'a given directory.')
+epilog = 'Creates SNV profiles for each single-sample VCF file in a given ' + \
+    'directory. Each VCF must be compressed and end in `.vcf.gz`. Samples ' + \
+    'are taken from each VCF\'s filename on the format `<sample>.vcf.gz`, ' + \
+    'where <sample> must correspond to the name specified in the VCF.'
+parser = argparse.ArgumentParser(epilog=epilog)
 parser.add_argument('input_dir',
                     type=str,
                     help='input directory path containing the VCF files')
