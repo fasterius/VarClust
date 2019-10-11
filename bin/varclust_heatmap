@@ -6,9 +6,12 @@ import varclust.cluster as cluster
 
 # Argument parser -------------------------------------------------------------
 
-parser = argparse.ArgumentParser(epilog='Hierarchically clusters and plots a '
-                                        'distance matrix using the '
-                                        'chosen method.')
+epilog = 'Hierarchically lusters and plots a distance matrix using the ' + \
+    'chosen method. A metadata file may also be included in order to ' + \
+    'group the results. A minimum of two metadata columns is required: ' + \
+    'an ID column column corresponding to the sample names used in the ' + \
+    'distance matrix, and a grouping column.'
+parser = argparse.ArgumentParser(epilog=epilog)
 parser.add_argument('input',
                     type=str,
                     help='input distance matrix file path')
@@ -28,7 +31,8 @@ parser.add_argument('-k', '--choose-k',
                     dest='choose_k',
                     default='geometric',
                     metavar='',
-                    help='\"manual\" or \"geometric\" [default] method to choose k')
+                    help='\"manual\" or \"geometric\" [default] method to ' + 
+                         'choose k')
 parser.add_argument('-c', '--cluster-groups',
                     action='store_true',
                     dest='cluster_groups',

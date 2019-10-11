@@ -60,13 +60,17 @@ varclust_distance_matrix <profile directory> <output distance matrix path>
 ```
 
 Clustering using either HAC or tSNE may then be performed using the resulting
-distance matrix:
+distance matrix and a metadata-file:
 
 ```bash
 varclust_heatmap <distance matrix> <output figure path>
 varclust_tsne <distance matrix> <output figure path> -m <metadata file>
               -M <metadata ID col> -c <colour col> -s <shape col>
 ```
+
+The metadata-file must at least contain (1) an ID column corresponding to the
+sample IDs used to create the distance matrix, and (2) a grouping column that
+will be used for *e.g.* clustering or colouring the groups.
 
 The variants in the profiles may also be aggregated into pseudo-profiles, where
 the variants and the number of times they occur in each included profile will

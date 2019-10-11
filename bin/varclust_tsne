@@ -5,9 +5,11 @@ import varclust.metadata as meta
 import varclust.cluster as cluster
 
 # Argument parser -------------------------------------------------------------
-
-parser = argparse.ArgumentParser(epilog='Clusters and plots a distance matrix '
-                                        'using tSNE.')
+epilog = 'Clusters and plots a distance matrix using tSNE. The metadata ' + \
+         'file must contain at least two columns: one ID column ' + \
+         'corresponding to the sample IDs used in the distance matrix, ' + \
+         'and a grouping column to be used for e.g. groups, colours, etc.'
+parser = argparse.ArgumentParser(epilog=epilog)
 parser.add_argument('input',
                     type=str,
                     help='input distance matrix file path')
