@@ -64,7 +64,7 @@ distance matrix and a metadata-file:
 
 ```bash
 varclust_heatmap <distance matrix> <output figure path>
-varclust_tsne <distance matrix> <output figure path> -m <metadata file>
+varclust_tsne <distance matrix> <metadata file> <output figure path>
               -M <metadata ID col> -c <colour col> -s <shape col>
 ```
 
