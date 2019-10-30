@@ -1,6 +1,7 @@
 import seaborn as sns
 import pandas as pd
 import numpy as np
+import numpy.matlib as npm
 import matplotlib.pyplot as plt
 import scipy.spatial.distance as dist
 from varclust.metadata import remove_metadata
@@ -83,8 +84,7 @@ def find_cluster_k(distances,
         # multiply the scalar product by the unit vector, we have
         # parallel_vector
         scalar_product = \
-            np.sum(dist_from_first * np.matlib.repmat(line_norm,
-                                                      n_points, 1), axis=1)
+            np.sum(dist_from_first * npm.repmat(line_norm, n_points, 1), axis=1)
         parallel_vector = np.outer(scalar_product, line_norm)
         vector_to_line = dist_from_first - parallel_vector
 
