@@ -30,12 +30,18 @@ def add_metadata(distances,
     # Set ID column to first column if not specified
     if id_col is None:
         id_col = metadata.columns[0]
-        print('Using ' + id_col + ' as metadata ID column')
+        print('Using `' + id_col + '` as metadata ID column')
 
     # Merge with distance matrix
     distances[id_col] = distances.index
     merged = pd.merge(distances, metadata, on=id_col)
     merged = merged.drop_duplicates(subset=id_col)
+
+    # Check that merged dataframe is not empty
+    if len(merged.index) == 0:
+        raise ValueError('The distance matrix and the metadata ID column `' +
+                         id_col + '` have no matching values; please use' +
+                         'another value for the metadata ID column')
 
     # Re-add index from ID column
     merged = merged.set_index(id_col)

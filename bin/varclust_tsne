@@ -16,12 +16,15 @@ parser.add_argument('distances',
 parser.add_argument('metadata_file',
                     type=str,
                     help='metadata file path')
-parser.add_argument('metadata_id',
-                    type=str,
-                    help='metadata ID column name')
 parser.add_argument('output',
                     type=str,
                     help='output image file path')
+parser.add_argument('-m', '--metadata-id',
+                    type=str,
+                    dest='metadata_id',
+                    default=None,
+                    metavar='',
+                    help='metadata ID column (default: first column)')
 parser.add_argument('-c', '--colour-col',
                     type=str,
                     dest='colour_col',
