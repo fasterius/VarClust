@@ -20,15 +20,17 @@ def remove_na(distance, threshold=5):
 
 def add_metadata(distances,
                  metadata_file,
-                 id_col,
+                 id_col=None,
                  encoding='iso8859_16'):
     "Adds metadata to a distance matrix."
 
-    if id_col is None:
-        raise RuntimeError('metadata id column missing.')
-
     # Read metadata
     metadata = pd.read_table(metadata_file, encoding=encoding)
+
+    # Set ID column to first column if not specified
+    if id_col is None:
+        id_col = metadata.columns[0]
+        print('Using ' + id_col + ' as metadata ID column')
 
     # Merge with distance matrix
     distances[id_col] = distances.index

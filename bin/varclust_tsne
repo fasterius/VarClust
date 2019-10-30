@@ -10,24 +10,18 @@ epilog = 'Clusters and plots a distance matrix using tSNE. The metadata ' + \
          'corresponding to the sample IDs used in the distance matrix, ' + \
          'and a grouping column to be used for e.g. groups, colours, etc.'
 parser = argparse.ArgumentParser(epilog=epilog)
-parser.add_argument('input',
+parser.add_argument('distances',
                     type=str,
                     help='input distance matrix file path')
+parser.add_argument('metadata_file',
+                    type=str,
+                    help='metadata file path')
+parser.add_argument('metadata_id',
+                    type=str,
+                    help='metadata ID column name')
 parser.add_argument('output',
                     type=str,
                     help='output image file path')
-parser.add_argument('-m', '--metadata-file',
-                    type=str,
-                    dest='metadata_file',
-                    default=None,
-                    metavar='',
-                    help='metadata file path')
-parser.add_argument('-M', '--metadata-id',
-                    type=str,
-                    dest='metadata_id',
-                    default=None,
-                    metavar='',
-                    help='metadata id column to merge on')
 parser.add_argument('-c', '--colour-col',
                     type=str,
                     dest='colour_col',
@@ -75,16 +69,15 @@ args = parser.parse_args()
 # Analysis --------------------------------------------------------------------
 
 # Read distance matrix
-distances = pd.read_csv(args.input, sep='\t', index_col=0)
+distances = pd.read_csv(args.distances, sep='\t', index_col=0)
 
 # Remove NAs
 distances = meta.remove_na(distances, threshold=args.remove_na_threshold)
 
-# Add metadata (if appliable)
-if args.metadata_file is not None:
-    distances = meta.add_metadata(distances,
-                                  args.metadata_file,
-                                  args.metadata_id)
+# Add metadata
+distances = meta.add_metadata(distances,
+                              args.metadata_file,
+                              args.metadata_id)
 
 # Subset groups (if applicable)
 if args.subset is not None:

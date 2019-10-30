@@ -352,6 +352,11 @@ def plot_tSNE(tsne,
               shape_cols=None):
     "Add metadata to an existing tSNE dataframe and plot for each group."
 
+    # Set colour and shape column to first metadata column if not specified
+    if colour_cols is None and shape_cols is None:
+        colour_cols = distances.columns[len(distances.index)]
+        shape_cols = colour_cols
+
     # Loop over each supplied colour and shape columns
     for colour_col, shape_col in zip(colour_cols.split(","),
                                      shape_cols.split(",")):
