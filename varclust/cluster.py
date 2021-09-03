@@ -202,7 +202,7 @@ def cluster_hierarchical(distances,
         cp.ax_col_dendrogram.set_visible(False)
 
         # Set colour gradient legend position and title
-        cp.cax.set_position([0.915, .2, .03, .45])
+        cp.cax.set_position([1, .2, .03, .45])
         cp.cax.set_title('Z-score', loc='left')
 
         # Add colour legend for groups
