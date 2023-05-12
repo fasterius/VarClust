@@ -80,6 +80,17 @@ be enumerated:
 varclust_pseudo <profile directory> <output pseudo-profile path>
 ```
 
+## Citation
+
+If you are using `VarClust` to analyse your data, please cite the following
+article:
+
+> **Single-cell RNA-seq variant analysis for exploration of genetic**
+> **heterogeneity in cancer**
+> <br/> Fasterius E., Uhlén M and Al-Khalili Szigyarto C.
+> <br/> *Scientific Reports* (2019), 9(1), 1–11
+> <br/> [https://doi.org/10.1038/s41598-019-45934-1]()
+
 ## Licence
 
 `VarClust` is released with a MIT licence. `VarClust` is free software: you may
